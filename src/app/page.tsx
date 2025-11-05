@@ -8,14 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { MessageCircle, Users, Zap } from 'lucide-react'
 import Header from '@/components/Header'
-
-const DUMMY_ROOMS = [
-  { id: 'general', name: 'General Chat' },
-  { id: 'random', name: 'Random' },
-  { id: 'tech', name: 'Tech Talk' },
-  { id: 'gaming', name: 'Gaming' },
-  { id: 'music', name: 'Music Lovers' },
-]
+import { DUMMY_ROOMS, APP_NAME, APP_TAGLINE, HOW_IT_WORKS, USE_CASES, MESSAGE_RETENTION, COPYRIGHT_YEAR } from '@/constants'
 
 export default function HomePage() {
   const [roomId, setRoomId] = useState('')
@@ -51,10 +44,10 @@ export default function HomePage() {
         <div className="text-center mb-12">
           <div className="flex items-center justify-center mb-4">
             <MessageCircle className="h-12 w-12 text-blue-600 dark:text-blue-400 mr-3" />
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white">TalkDrop</h1>
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white">{APP_NAME}</h1>
           </div>
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
-            Instant chat rooms for quick conversations
+            {APP_TAGLINE}
           </p>
         </div>
 
@@ -192,9 +185,43 @@ export default function HomePage() {
           </CardContent>
         </Card>
 
+        {/* How It Works */}
+        <div className="mt-20">
+          <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-8">How It Works</h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            {HOW_IT_WORKS.map((item) => (
+              <div key={item.step} className="text-center">
+                <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-xl font-bold text-blue-600 dark:text-blue-400">{item.step}</span>
+                </div>
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{item.title}</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300">{item.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Use Cases */}
+        <div className="mt-20">
+          <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-8">Perfect For</h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            {USE_CASES.map((useCase) => (
+              <Card key={useCase.title}>
+                <CardHeader>
+                  <CardTitle className="text-lg">{useCase.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">{useCase.description}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
         {/* Footer */}
-        <div className="text-center mt-12 text-sm text-gray-500 dark:text-gray-400">
-          <p>Messages are automatically deleted after 24 hours</p>
+        <div className="text-center mt-20 pb-8 text-sm text-gray-500 dark:text-gray-400">
+          <p className="mb-2">Messages are automatically deleted after {MESSAGE_RETENTION}</p>
+          <p>© {COPYRIGHT_YEAR} {APP_NAME}. All rights reserved.</p>
         </div>
       </div>
       </div>

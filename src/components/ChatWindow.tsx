@@ -6,6 +6,7 @@ import RoomHeader from './RoomHeader'
 import MessageList from './MessageList'
 import MessageInput from './MessageInput'
 import PresenceList from './PresenceList'
+import { MOCK_MESSAGES, MOCK_USERS } from '@/constants'
 
 interface Message {
   id: string
@@ -49,20 +50,10 @@ export default function ChatWindow({ roomId }: { roomId: string }) {
 
     // Mock data for development
     setMessages([
-      {
-        id: '1',
-        senderId: 'user1',
-        senderName: 'Alice',
-        text: 'Hey everyone! 👋',
-        createdAt: Date.now() - 300000
-      },
-      {
-        id: '2',
-        senderId: 'user2',
-        senderName: 'Bob',
-        text: 'Hello! How is everyone doing?',
-        createdAt: Date.now() - 240000
-      },
+      ...MOCK_MESSAGES.map(msg => ({
+        ...msg,
+        createdAt: Date.now() - msg.timeOffset
+      })),
       {
         id: '3',
         senderId: user.id,
@@ -73,8 +64,10 @@ export default function ChatWindow({ roomId }: { roomId: string }) {
     ])
 
     setUsers([
-      { id: 'user1', displayName: 'Alice', online: true, lastSeen: Date.now() },
-      { id: 'user2', displayName: 'Bob', online: true, lastSeen: Date.now() - 60000 },
+      ...MOCK_USERS.map(u => ({
+        ...u,
+        lastSeen: Date.now() - u.lastSeenOffset
+      })),
       user
     ])
   }, [roomId, router])
