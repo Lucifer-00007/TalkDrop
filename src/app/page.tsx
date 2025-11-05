@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { MessageCircle, Users, Zap } from 'lucide-react'
+import Header from '@/components/Header'
 
 const DUMMY_ROOMS = [
   { id: 'general', name: 'General Chat' },
@@ -41,15 +42,18 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+      <Header />
+
+      <div className="flex items-center justify-center p-4 pt-20">
       <div className="w-full max-w-4xl">
-        {/* Header */}
+        {/* Hero */}
         <div className="text-center mb-12">
           <div className="flex items-center justify-center mb-4">
-            <MessageCircle className="h-12 w-12 text-blue-600 mr-3" />
-            <h1 className="text-4xl font-bold text-gray-900">TalkDrop</h1>
+            <MessageCircle className="h-12 w-12 text-blue-600 dark:text-blue-400 mr-3" />
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white">TalkDrop</h1>
           </div>
-          <p className="text-xl text-gray-600 mb-8">
+          <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
             Instant chat rooms for quick conversations
           </p>
         </div>
@@ -189,9 +193,10 @@ export default function HomePage() {
         </Card>
 
         {/* Footer */}
-        <div className="text-center mt-12 text-sm text-gray-500">
+        <div className="text-center mt-12 text-sm text-gray-500 dark:text-gray-400">
           <p>Messages are automatically deleted after 24 hours</p>
         </div>
+      </div>
       </div>
     </div>
   )
