@@ -52,23 +52,23 @@ export default function RoomHeader({ roomId }: RoomHeaderProps) {
   }
 
   return (
-    <header className="bg-white border-b border-gray-200 px-4 py-3">
+    <header className="px-4 py-3" style={{ backgroundColor: '#1b48ac' }}>
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => router.push('/')}
-            className="lg:hidden"
+            className="lg:hidden text-white hover:bg-white/10"
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
           
           <div>
-            <h1 className="text-lg font-semibold text-gray-900">
+            <h1 className="text-lg font-semibold text-white">
               Room {roomId}
             </h1>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-white/80">
               Share this room ID to invite others
             </p>
           </div>
@@ -79,7 +79,7 @@ export default function RoomHeader({ roomId }: RoomHeaderProps) {
           <Button
             variant="ghost"
             size="icon"
-            className="lg:hidden"
+            className="lg:hidden text-white hover:bg-white/10"
           >
             <Users className="h-5 w-5" />
           </Button>
@@ -88,7 +88,7 @@ export default function RoomHeader({ roomId }: RoomHeaderProps) {
             variant="outline"
             size="sm"
             onClick={copyRoomLink}
-            className="hidden sm:flex"
+            className="hidden sm:flex bg-white/10 border-white/20 text-white hover:bg-white/20"
           >
             <Copy className="h-4 w-4 mr-2" />
             {copied ? 'Copied!' : 'Copy Link'}
@@ -98,7 +98,7 @@ export default function RoomHeader({ roomId }: RoomHeaderProps) {
             variant="outline"
             size="sm"
             onClick={shareRoom}
-            className="sm:hidden"
+            className="sm:hidden bg-white/10 border-white/20 text-white hover:bg-white/20"
           >
             <Share2 className="h-4 w-4" />
           </Button>
@@ -107,7 +107,7 @@ export default function RoomHeader({ roomId }: RoomHeaderProps) {
             variant="outline"
             size="sm"
             onClick={shareRoom}
-            className="hidden sm:flex"
+            className="hidden sm:flex bg-white/10 border-white/20 text-white hover:bg-white/20"
           >
             <Share2 className="h-4 w-4 mr-2" />
             Share

@@ -20,10 +20,12 @@ export default function HomePage() {
   const [roomId, setRoomId] = useState('')
   const [displayName, setDisplayName] = useState('')
   const [selectedRoom, setSelectedRoom] = useState('')
+  const [roomName, setRoomName] = useState('')
+  const [mode, setMode] = useState<'create' | 'join'>('create')
   const router = useRouter()
 
   const createRoom = () => {
-    const newRoomId = Math.random().toString(36).substring(2, 8)
+    const newRoomId = roomName.trim() || Math.random().toString(36).substring(2, 8)
     if (displayName.trim()) {
       localStorage.setItem('displayName', displayName.trim())
       router.push(`/room/${newRoomId}`)
@@ -108,40 +110,61 @@ export default function HomePage() {
                 className="w-full"
               />
             </div>
-            
-            <div className="space-y-3">
-              <Button 
-                onClick={createRoom}
-                className="w-full"
-                disabled={!displayName.trim()}
+
+            <div className="flex gap-2 p-1 bg-muted rounded-lg">
+              <Button
+                variant={mode === 'create' ? 'default' : 'ghost'}
+                className="flex-1"
+                onClick={() => setMode('create')}
               >
-                Create New Room
+                Create New
               </Button>
-              
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-background px-2 text-muted-foreground">
-                    Or
-                  </span>
-                </div>
-              </div>
-              
+              <Button
+                variant={mode === 'join' ? 'default' : 'ghost'}
+                className="flex-1"
+                onClick={() => setMode('join')}
+              >
+                Join Existing
+              </Button>
+            </div>
+            
+            {mode === 'create' ? (
               <div className="space-y-2">
-                <Select value={selectedRoom} onValueChange={setSelectedRoom}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a room" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {DUMMY_ROOMS.map((room) => (
-                      <SelectItem key={room.id} value={room.id}>
-                        {room.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Input
+                  placeholder="Room name (optional)"
+                  value={roomName}
+                  onChange={(e) => setRoomName(e.target.value)}
+                />
+                <Button 
+                  onClick={createRoom}
+                  className="w-full"
+                  disabled={!displayName.trim()}
+                >
+                  Create New Room
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <div className="flex gap-2">
+                  <Select value={selectedRoom} onValueChange={setSelectedRoom}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a room" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {DUMMY_ROOMS.map((room) => (
+                        <SelectItem key={room.id} value={room.id}>
+                          {room.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button 
+                    onClick={joinRoom}
+                    disabled={!selectedRoom || !displayName.trim()}
+                  >
+                    Join
+                  </Button>
+                </div>
                 
                 <div className="flex gap-2">
                   <Input
@@ -155,14 +178,13 @@ export default function HomePage() {
                   />
                   <Button 
                     onClick={joinRoom}
-                    variant="outline"
                     disabled={(!roomId.trim() && !selectedRoom) || !displayName.trim()}
                   >
                     Join
                   </Button>
                 </div>
               </div>
-            </div>
+            )}
           </CardContent>
         </Card>
 

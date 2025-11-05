@@ -53,9 +53,9 @@ export default function PresenceList({ users }: PresenceListProps) {
   const offlineUsers = users.filter(user => !user.online)
 
   return (
-    <div className="p-4 h-full overflow-y-auto">
+    <div className="p-4 h-full overflow-y-auto" style={{ backgroundColor: '#2b56b4' }}>
       <div className="mb-4">
-        <h3 className="text-sm font-semibold text-gray-900 mb-2">
+        <h3 className="text-sm font-semibold text-white mb-2">
           Online ({onlineUsers.length})
         </h3>
         
@@ -72,10 +72,10 @@ export default function PresenceList({ users }: PresenceListProps) {
               </div>
               
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">
+                <p className="text-sm font-medium text-white truncate">
                   {user.displayName}
                 </p>
-                <p className="text-xs text-green-600">Online</p>
+                <p className="text-xs text-green-300">Online</p>
               </div>
             </div>
           ))}
@@ -84,7 +84,7 @@ export default function PresenceList({ users }: PresenceListProps) {
 
       {offlineUsers.length > 0 && (
         <div>
-          <h3 className="text-sm font-semibold text-gray-900 mb-2">
+          <h3 className="text-sm font-semibold text-white mb-2">
             Offline ({offlineUsers.length})
           </h3>
           
@@ -101,10 +101,10 @@ export default function PresenceList({ users }: PresenceListProps) {
                 </div>
                 
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-600 truncate">
+                  <p className="text-sm font-medium text-white/70 truncate">
                     {user.displayName}
                   </p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-white/50">
                     {formatLastSeen(user.lastSeen)}
                   </p>
                 </div>
@@ -115,7 +115,7 @@ export default function PresenceList({ users }: PresenceListProps) {
       )}
 
       {users.length === 0 && (
-        <div className="text-center text-gray-500 mt-8">
+        <div className="text-center text-white/70 mt-8">
           <p className="text-sm">No users in this room yet</p>
         </div>
       )}

@@ -125,6 +125,11 @@ export default function ChatWindow({ roomId }: { roomId: string }) {
       <RoomHeader roomId={roomId} />
       
       <div className="flex-1 flex">
+        {/* Presence sidebar - hidden on mobile */}
+        <div className="hidden lg:block w-64">
+          <PresenceList users={users} />
+        </div>
+
         {/* Main chat area */}
         <div className="flex-1 flex flex-col">
           <MessageList 
@@ -136,11 +141,6 @@ export default function ChatWindow({ roomId }: { roomId: string }) {
             onSendMessage={sendMessage}
             onTyping={handleTyping}
           />
-        </div>
-
-        {/* Presence sidebar - hidden on mobile */}
-        <div className="hidden lg:block w-64 border-l bg-white">
-          <PresenceList users={users} />
         </div>
       </div>
     </div>
