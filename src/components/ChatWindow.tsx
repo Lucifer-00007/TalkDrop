@@ -114,26 +114,30 @@ export default function ChatWindow({ roomId }: { roomId: string }) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
+    <div className="h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
       <RoomHeader roomId={roomId} />
       
-      <div className="flex-1 flex">
+      <div className="flex-1 flex overflow-hidden">
         {/* Presence sidebar - hidden on mobile */}
         <div className="hidden lg:block w-64">
           <PresenceList users={users} />
         </div>
 
         {/* Main chat area */}
-        <div className="flex-1 flex flex-col">
-          <MessageList 
-            messages={messages} 
-            currentUserId={currentUser.id}
-            typingUsers={typingUsers}
-          />
-          <MessageInput 
-            onSendMessage={sendMessage}
-            onTyping={handleTyping}
-          />
+        <div className="flex-1 flex flex-col relative">
+          <div className="flex-1 overflow-hidden pb-28 bg-white dark:bg-gray-800">
+            <MessageList 
+              messages={messages} 
+              currentUserId={currentUser.id}
+              typingUsers={typingUsers}
+            />
+          </div>
+          <div className="absolute bottom-0 left-0 right-0 z-10">
+            <MessageInput 
+              onSendMessage={sendMessage}
+              onTyping={handleTyping}
+            />
+          </div>
         </div>
       </div>
     </div>

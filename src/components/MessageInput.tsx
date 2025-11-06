@@ -21,7 +21,7 @@ export default function MessageInput({ onSendMessage, onTyping }: MessageInputPr
       setMessage('')
       setIsTyping(false)
       onTyping(false)
-      
+
       // Reset textarea height
       if (textareaRef.current) {
         textareaRef.current.style.height = 'auto'
@@ -87,17 +87,18 @@ export default function MessageInput({ onSendMessage, onTyping }: MessageInputPr
             style={{ minHeight: '40px', maxHeight: '120px' }}
           />
         </div>
-        
+
         <Button
           onClick={handleSend}
           disabled={!message.trim()}
           size="icon"
-          className="h-10 w-10 rounded-lg"
+          className="h-10 w-28 rounded-lg"
         >
-          <Send className="h-4 w-4" />
+          Send
+          <Send className="ml-1 h-4 w-4" />
         </Button>
       </div>
-      
+
       <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
         Press Enter to send, Shift+Enter for new line
       </div>

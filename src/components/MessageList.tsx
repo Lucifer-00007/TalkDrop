@@ -26,7 +26,7 @@ export default function MessageList({ messages, currentUserId, typingUsers }: Me
 
   useEffect(() => {
     scrollToBottom()
-  }, [messages])
+  }, [messages, typingUsers.length])
 
   const formatTime = (timestamp: number) => {
     return new Date(timestamp).toLocaleTimeString([], { 
@@ -49,7 +49,7 @@ export default function MessageList({ messages, currentUserId, typingUsers }: Me
   }
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 space-y-1 bg-white dark:bg-gray-800">
+    <div className="h-full overflow-y-auto p-4 pb-4 space-y-1 bg-white dark:bg-gray-800">
       {messages.map((message, index) => (
         <div key={message.id}>
           {shouldShowTimestamp(message, index) && (

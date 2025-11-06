@@ -4,6 +4,7 @@ export async function generateStaticParams() {
   return [
     { id: 'general' },
     { id: 'random' },
+    { id: 'tech' },
   ]
 }
 
