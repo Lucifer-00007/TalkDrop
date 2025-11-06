@@ -13,7 +13,7 @@ export default function MessageInput({ onSendMessage, onTyping }: MessageInputPr
   const [message, setMessage] = useState('')
   const [isTyping, setIsTyping] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const typingTimeoutRef = useRef<NodeJS.Timeout>()
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   const handleSend = () => {
     if (message.trim()) {

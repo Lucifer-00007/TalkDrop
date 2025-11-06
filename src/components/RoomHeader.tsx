@@ -39,7 +39,7 @@ export default function RoomHeader({ roomId }: RoomHeaderProps) {
       await navigator.clipboard.writeText(url)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
-    } catch (err) {
+    } catch {
       // Fallback for older browsers
       const textArea = document.createElement('textarea')
       textArea.value = url
@@ -62,7 +62,7 @@ export default function RoomHeader({ roomId }: RoomHeaderProps) {
           text: 'Join this chat room on TalkDrop',
           url: url,
         })
-      } catch (err) {
+      } catch {
         // User cancelled sharing
       }
     } else {

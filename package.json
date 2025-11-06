@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "preview": "npx serve out",
+    "deploy": "npm install && next build && firebase deploy --only hosting",
     "start": "next start",
     "lint": "next lint"
   },

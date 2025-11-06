@@ -1,11 +1,12 @@
-'use client'
+import RoomPageClient from '@/components/RoomPageClient'
 
-import { useParams } from 'next/navigation'
-import ChatWindow from '@/components/ChatWindow'
+export async function generateStaticParams() {
+  return [
+    { id: 'general' },
+    { id: 'random' },
+  ]
+}
 
 export default function RoomPage() {
-  const params = useParams()
-  const roomId = params.id as string
-
-  return <ChatWindow roomId={roomId} />
+  return <RoomPageClient />
 }
