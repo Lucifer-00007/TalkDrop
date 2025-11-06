@@ -52,8 +52,7 @@ export default function HomePage() {
           </div>
 
           {/* Features */}
-          <div className="bg-white/50 dark:bg-gray-800/50 rounded-2xl p-8 mb-16">
-            <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-3 gap-6 mb-16">
               <Card>
                 <CardHeader className="text-center">
                   <Zap className="h-8 w-8 text-blue-600 mx-auto mb-2" />
@@ -89,11 +88,10 @@ export default function HomePage() {
                   </CardDescription>
                 </CardContent>
               </Card>
-            </div>
           </div>
 
           {/* Main Action Card */}
-          <div className="bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-gray-700 dark:to-gray-800 rounded-2xl p-8 mb-16">
+          <div className="mb-20">
             <Card className="max-w-md mx-auto">
               <CardHeader>
                 <CardTitle className="text-center">Get Started</CardTitle>
@@ -146,7 +144,10 @@ export default function HomePage() {
                 ) : (
                   <div className="space-y-2">
                     <div className="flex gap-2">
-                      <Select value={selectedRoom} onValueChange={setSelectedRoom}>
+                      <Select value={selectedRoom} onValueChange={(value) => {
+                        setSelectedRoom(value)
+                        setRoomId('')
+                      }}>
                         <SelectTrigger>
                           <SelectValue placeholder="Select a room" />
                         </SelectTrigger>
@@ -159,7 +160,10 @@ export default function HomePage() {
                         </SelectContent>
                       </Select>
                       <Button
-                        onClick={joinRoom}
+                        onClick={() => {
+                          console.log('Dropdown Join:', { selectedRoom, displayName: displayName.trim() })
+                          joinRoom()
+                        }}
                         disabled={!selectedRoom || !displayName.trim()}
                       >
                         Join
@@ -178,7 +182,7 @@ export default function HomePage() {
                       />
                       <Button
                         onClick={joinRoom}
-                        disabled={(!roomId.trim() && !selectedRoom) || !displayName.trim()}
+                        disabled={!roomId.trim() || !displayName.trim()}
                       >
                         Join
                       </Button>
@@ -190,7 +194,7 @@ export default function HomePage() {
           </div>
 
           {/* How It Works */}
-          <div className="mt-20 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-8">
+          <div className="bg-white/30 dark:bg-gray-800/30 rounded-2xl p-12 mb-20">
             <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-8">How It Works</h2>
             <div className="grid md:grid-cols-3 gap-8">
               {HOW_IT_WORKS.map((item) => (
@@ -206,7 +210,7 @@ export default function HomePage() {
           </div>
 
           {/* Use Cases */}
-          <div className="mt-20 bg-white/50 dark:bg-gray-800/50 rounded-2xl p-8">
+          <div className="mb-20">
             <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-8">Perfect For</h2>
             <div className="grid md:grid-cols-2 gap-6">
               {USE_CASES.map((useCase) => (
