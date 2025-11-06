@@ -59,7 +59,7 @@ export default function MessageItem({ message, isOwn, showAvatar }: MessageItemP
       {/* Message content */}
       <div className={`flex flex-col max-w-xs lg:max-w-md ${isOwn ? 'items-end' : 'items-start'}`}>
         {showAvatar && !isOwn && (
-          <span className="text-xs text-gray-600 mb-1 px-1">
+          <span className="text-xs text-gray-600 dark:text-gray-400 mb-1 px-1">
             {message.senderName}
           </span>
         )}
@@ -68,7 +68,7 @@ export default function MessageItem({ message, isOwn, showAvatar }: MessageItemP
           className={`px-3 py-2 rounded-lg break-words ${
             isOwn
               ? 'bg-blue-600 text-white rounded-br-sm'
-              : 'bg-white border border-gray-200 text-gray-900 rounded-bl-sm'
+              : 'bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-bl-sm'
           }`}
         >
           <p className="text-sm whitespace-pre-wrap">{message.text}</p>

@@ -41,7 +41,7 @@ export default function HomePage() {
       <div className="flex items-center justify-center p-4 pt-20">
         <div className="w-full max-w-4xl">
           {/* Hero */}
-          <div className="text-center mb-16">
+          <div className="text-center mb-16 mt-4">
             <div className="flex items-center justify-center mb-4">
               <MessageCircle className="h-12 w-12 text-blue-600 dark:text-blue-400 mr-3" />
               <h1 className="text-4xl font-bold text-gray-900 dark:text-white">{APP_NAME}</h1>

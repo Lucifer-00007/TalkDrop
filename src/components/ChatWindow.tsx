@@ -114,7 +114,7 @@ export default function ChatWindow({ roomId }: { roomId: string }) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
       <RoomHeader roomId={roomId} />
       
       <div className="flex-1 flex">

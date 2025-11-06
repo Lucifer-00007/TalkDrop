@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Copy, Share2, ArrowLeft, Users } from 'lucide-react'
+import { Copy, Share2, ArrowLeft, Users, Moon, Sun } from 'lucide-react'
 
 interface RoomHeaderProps {
   roomId: string
@@ -11,7 +11,27 @@ interface RoomHeaderProps {
 
 export default function RoomHeader({ roomId }: RoomHeaderProps) {
   const [copied, setCopied] = useState(false)
+  const [isDark, setIsDark] = useState(false)
   const router = useRouter()
+
+  useEffect(() => {
+    const theme = localStorage.getItem('theme')
+    setIsDark(theme === 'dark')
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark')
+    }
+  }, [])
+
+  const toggleTheme = () => {
+    setIsDark(!isDark)
+    if (!isDark) {
+      document.documentElement.classList.add('dark')
+      localStorage.setItem('theme', 'dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+      localStorage.setItem('theme', 'light')
+    }
+  }
 
   const copyRoomLink = async () => {
     const url = `${window.location.origin}/room/${roomId}`
@@ -75,6 +95,15 @@ export default function RoomHeader({ roomId }: RoomHeaderProps) {
         </div>
 
         <div className="flex items-center space-x-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleTheme}
+            className="text-white hover:bg-white/10"
+          >
+            {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          </Button>
+
           {/* Mobile users indicator */}
           <Button
             variant="ghost"
