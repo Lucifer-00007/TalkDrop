@@ -10,7 +10,7 @@ A modern, real-time chat application built with Next.js. Create or join chat roo
 ## ✨ Features
 
 - 🚀 **Instant Setup** - Create or join rooms in seconds
-- 💬 **Real-time Chat** - Messages appear instantly with typing indicators
+- 💬 **Real-time Chat** - Messages appear instantly with typing indicators and timestamps
 - 🔒 **Anonymous & Safe** - No registration required, automatic message cleanup
 - 📱 **Responsive Design** - Works seamlessly on desktop and mobile
 - 🌙 **Dark Mode** - Built-in theme switching
@@ -116,6 +116,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  outputFileTracingRoot: __dirname,
 }
 ```
 
