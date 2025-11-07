@@ -23,6 +23,8 @@ A modern, real-time chat application built with Next.js. Create or join chat roo
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 - **UI Components**: [Radix UI](https://www.radix-ui.com/)
 - **Icons**: [Lucide React](https://lucide.dev/)
+- **Backend**: [Firebase](https://firebase.google.com/) (Realtime Database + Firestore)
+- **Authentication**: Firebase Anonymous Auth
 - **Build**: Static export for universal deployment
 
 ## 🚀 Quick Start
@@ -45,12 +47,17 @@ A modern, real-time chat application built with Next.js. Create or join chat roo
    npm install
    ```
 
-3. **Start development server**
+3. **Set up Firebase** (Required for real-time features)
+   - **Quick Start**: See [QUICK_START.md](QUICK_START.md) for 5-minute setup
+   - **Detailed Setup**: See [FIREBASE_SETUP.md](FIREBASE_SETUP.md) for production
+   - **Local Development**: See [LOCAL_DEVELOPMENT.md](LOCAL_DEVELOPMENT.md) for emulators
+
+4. **Start development server**
    ```bash
    npm run dev
    ```
 
-4. **Open your browser**
+5. **Open your browser**
    ```
    http://localhost:3000
    ```
@@ -104,7 +111,19 @@ src/
 
 ### Environment Variables
 
-No environment variables required for basic functionality.
+Firebase configuration is required for real-time functionality:
+
+```env
+NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+NEXT_PUBLIC_FIREBASE_DATABASE_URL=https://your_project-rtdb.firebaseio.com/
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+```
+
+See [FIREBASE_SETUP.md](FIREBASE_SETUP.md) for setup instructions.
 
 ### Next.js Config
 

@@ -6,9 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "preview": "npx serve out",
-    "deploy": "npm install && next build && firebase deploy --only hosting",
+    "deploy": "npm run build && firebase deploy",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "emulators": "firebase emulators:start",
+    "dev:local": "concurrently \"firebase emulators:start\" \"next dev\""
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.11",
@@ -26,6 +28,7 @@
     "clsx": "^2.1.1",
     "eslint": "^9.17.0",
     "eslint-config-next": "^15.1.3",
+    "firebase": "^12.5.0",
     "lucide-react": "^0.552.0",
     "next": "^15.1.3",
     "postcss": "^8.5.2",
@@ -46,5 +49,8 @@
   "bugs": {
     "url": "https://github.com/Lucifer-00007/TalkDrop/issues"
   },
-  "homepage": "https://github.com/Lucifer-00007/TalkDrop#readme"
+  "homepage": "https://github.com/Lucifer-00007/TalkDrop#readme",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
 }

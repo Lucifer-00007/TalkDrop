@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { MessageCircle, Users, Zap } from 'lucide-react'
 import Header from '@/components/Header'
+import { useAuth } from '@/hooks/useAuth'
 import { DUMMY_ROOMS, APP_NAME, APP_TAGLINE, HOW_IT_WORKS, USE_CASES, MESSAGE_RETENTION, COPYRIGHT_YEAR } from '@/constants'
 
 export default function HomePage() {
@@ -16,21 +17,37 @@ export default function HomePage() {
   const [selectedRoom, setSelectedRoom] = useState('')
   const [roomName, setRoomName] = useState('')
   const [mode, setMode] = useState<'create' | 'join'>('create')
+  const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const { signIn } = useAuth()
 
-  const createRoom = () => {
+  const createRoom = async () => {
     const newRoomId = roomName.trim() || Math.random().toString(36).substring(2, 8)
     if (displayName.trim()) {
-      localStorage.setItem('displayName', displayName.trim())
-      router.push(`/room/${newRoomId}`)
+      setLoading(true)
+      try {
+        await signIn(displayName.trim())
+        router.push(`/room/${newRoomId}`)
+      } catch (error) {
+        console.error('Failed to create room:', error)
+      } finally {
+        setLoading(false)
+      }
     }
   }
 
-  const joinRoom = () => {
+  const joinRoom = async () => {
     const targetRoom = selectedRoom || roomId.trim()
     if (targetRoom && displayName.trim()) {
-      localStorage.setItem('displayName', displayName.trim())
-      router.push(`/room/${targetRoom}`)
+      setLoading(true)
+      try {
+        await signIn(displayName.trim())
+        router.push(`/room/${targetRoom}`)
+      } catch (error) {
+        console.error('Failed to join room:', error)
+      } finally {
+        setLoading(false)
+      }
     }
   }
 
@@ -136,9 +153,9 @@ export default function HomePage() {
                     <Button
                       onClick={createRoom}
                       className="w-full"
-                      disabled={!displayName.trim()}
+                      disabled={!displayName.trim() || loading}
                     >
-                      Create New Room
+                      {loading ? 'Creating...' : 'Create New Room'}
                     </Button>
                   </div>
                 ) : (
@@ -164,9 +181,9 @@ export default function HomePage() {
                           console.log('Dropdown Join:', { selectedRoom, displayName: displayName.trim() })
                           joinRoom()
                         }}
-                        disabled={!selectedRoom || !displayName.trim()}
+                        disabled={!selectedRoom || !displayName.trim() || loading}
                       >
-                        Join
+                        {loading ? 'Joining...' : 'Join'}
                       </Button>
                     </div>
 
@@ -182,9 +199,9 @@ export default function HomePage() {
                       />
                       <Button
                         onClick={joinRoom}
-                        disabled={!roomId.trim() || !displayName.trim()}
+                        disabled={!roomId.trim() || !displayName.trim() || loading}
                       >
-                        Join
+                        {loading ? 'Joining...' : 'Join'}
                       </Button>
                     </div>
                   </div>

@@ -1,108 +1,41 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 import RoomHeader from './RoomHeader'
 import MessageList from './MessageList'
 import MessageInput from './MessageInput'
 import PresenceList from './PresenceList'
-import { MOCK_MESSAGES, MOCK_USERS } from '@/constants'
-
-interface Message {
-  id: string
-  senderId: string
-  senderName: string
-  text: string
-  createdAt: number
-}
-
-interface User {
-  id: string
-  displayName: string
-  online: boolean
-  lastSeen: number
-}
+import { useAuth } from '@/hooks/useAuth'
+import { useRoom } from '@/hooks/useRoom'
 
 export default function ChatWindow({ roomId }: { roomId: string }) {
-  const [messages, setMessages] = useState<Message[]>([])
-  const [users, setUsers] = useState<User[]>([])
-  const [currentUser, setCurrentUser] = useState<User | null>(null)
-  const [typingUsers, setTypingUsers] = useState<string[]>([])
   const router = useRouter()
+  const { isAuthenticated, signIn } = useAuth()
+  const { messages, users, typingUsers, loading, sendMessage, handleTyping, currentUser } = useRoom(roomId)
 
   useEffect(() => {
-    // Get display name from localStorage or redirect to home
-    const displayName = localStorage.getItem('displayName')
-    if (!displayName) {
-      router.push('/')
-      return
-    }
-
-    // Create current user
-    const userId = Math.random().toString(36).substring(2, 15)
-    const user: User = {
-      id: userId,
-      displayName,
-      online: true,
-      lastSeen: Date.now()
-    }
-    setCurrentUser(user)
-
-    // Mock data for development
-    setMessages([
-      ...MOCK_MESSAGES.map(msg => ({
-        ...msg,
-        createdAt: Date.now() - msg.timeOffset
-      })),
-      {
-        id: '3',
-        senderId: user.id,
-        senderName: user.displayName,
-        text: 'Just joined the room!',
-        createdAt: Date.now() - 120000
+    const initAuth = async () => {
+      const savedDisplayName = localStorage.getItem('displayName')
+      if (!savedDisplayName) {
+        router.push('/')
+        return
       }
-    ])
-
-    setUsers([
-      ...MOCK_USERS.map(u => ({
-        ...u,
-        lastSeen: Date.now() - u.lastSeenOffset
-      })),
-      user
-    ])
-  }, [roomId, router])
-
-  const sendMessage = (text: string) => {
-    if (!currentUser || !text.trim()) return
-
-    const newMessage: Message = {
-      id: Math.random().toString(36).substring(2, 15),
-      senderId: currentUser.id,
-      senderName: currentUser.displayName,
-      text: text.trim(),
-      createdAt: Date.now()
+      
+      if (!isAuthenticated) {
+        try {
+          await signIn(savedDisplayName)
+        } catch (error) {
+          console.error('Authentication failed:', error)
+          router.push('/')
+        }
+      }
     }
 
-    setMessages(prev => [...prev, newMessage])
-  }
+    initAuth()
+  }, [isAuthenticated, router, signIn])
 
-  const handleTyping = (isTyping: boolean) => {
-    if (!currentUser) return
-    
-    if (isTyping) {
-      setTypingUsers(prev => 
-        prev.includes(currentUser.displayName) 
-          ? prev 
-          : [...prev, currentUser.displayName]
-      )
-    } else {
-      setTypingUsers(prev => 
-        prev.filter(name => name !== currentUser.displayName)
-      )
-    }
-  }
-
-  if (!currentUser) {
+  if (loading || !isAuthenticated || !currentUser) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
