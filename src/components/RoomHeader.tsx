@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Copy, Share2, ArrowLeft, Users, Moon, Sun } from 'lucide-react'
+import { Copy, Share2, ArrowLeft, Users, Moon, Sun, LogOut } from 'lucide-react'
 
 interface RoomHeaderProps {
   roomId: string
@@ -69,6 +69,10 @@ export default function RoomHeader({ roomId }: RoomHeaderProps) {
       // Fallback to copy
       copyRoomLink()
     }
+  }
+
+  const exitRoom = () => {
+    router.push('/')
   }
 
   return (
@@ -140,6 +144,16 @@ export default function RoomHeader({ roomId }: RoomHeaderProps) {
           >
             <Share2 className="h-4 w-4 mr-2" />
             Share
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={exitRoom}
+            className="bg-white/10 border-red-400/30 text-white hover:bg-white/20"
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            <span className="hidden sm:inline">Exit</span>
           </Button>
         </div>
       </div>
