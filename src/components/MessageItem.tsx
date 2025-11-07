@@ -26,6 +26,13 @@ export default function MessageItem({ message, isOwn, showAvatar }: MessageItemP
       .slice(0, 2)
   }
 
+  const formatTime = (timestamp: number) => {
+    return new Date(timestamp).toLocaleTimeString([], { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    })
+  }
+
   const getAvatarColor = (name: string) => {
     const colors = [
       'bg-red-500',
@@ -72,6 +79,13 @@ export default function MessageItem({ message, isOwn, showAvatar }: MessageItemP
           }`}
         >
           <p className="text-sm whitespace-pre-wrap">{message.text}</p>
+          <p className={`text-xs mt-1 text-right ${
+            isOwn 
+              ? 'text-blue-100' 
+              : 'text-gray-500 dark:text-gray-400'
+          }`}>
+            {formatTime(message.createdAt)}
+          </p>
         </div>
       </div>
     </div>
