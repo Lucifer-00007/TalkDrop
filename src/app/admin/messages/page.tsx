@@ -20,6 +20,7 @@ export default function MessagesPage() {
   const [clearRoomDialogOpen, setClearRoomDialogOpen] = useState(false)
   const [selectedMessage, setSelectedMessage] = useState<AdminMessage | null>(null)
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null)
+  const [deleting, setDeleting] = useState(false)
 
   const loadMessages = useCallback(async () => {
     setLoading(true)
@@ -63,6 +64,7 @@ export default function MessagesPage() {
   const handleDeleteMessage = async () => {
     if (!selectedMessage) return
     
+    setDeleting(true)
     try {
       await deleteMessage(selectedMessage.roomId, selectedMessage.id)
       setMessages(prev => prev.filter(m => m.id !== selectedMessage.id))
@@ -70,12 +72,15 @@ export default function MessagesPage() {
       setSelectedMessage(null)
     } catch (error) {
       console.error('Failed to delete message:', error)
+    } finally {
+      setDeleting(false)
     }
   }
 
   const handleDeleteRoom = async () => {
     if (!selectedRoomId) return
     
+    setDeleting(true)
     try {
       await deleteRoomMessages(selectedRoomId)
       setMessages(prev => prev.filter(m => m.roomId !== selectedRoomId))
@@ -83,6 +88,8 @@ export default function MessagesPage() {
       setSelectedRoomId(null)
     } catch (error) {
       console.error('Failed to delete room messages:', error)
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -175,6 +182,7 @@ export default function MessagesPage() {
           title="Delete Message"
           description="Are you sure you want to delete this message? This action cannot be undone."
           onConfirm={handleDeleteMessage}
+          loading={deleting}
         />
 
         <ConfirmDialog
@@ -184,6 +192,7 @@ export default function MessagesPage() {
           description={`Are you sure you want to delete all messages in room ${selectedRoomId}? This action cannot be undone.`}
           onConfirm={handleDeleteRoom}
           confirmText="Delete All"
+          loading={deleting}
         />
       </div>
     </AdminLayout>

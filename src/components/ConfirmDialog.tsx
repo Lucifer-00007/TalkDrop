@@ -8,6 +8,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { Loader2 } from 'lucide-react'
 
 interface ConfirmDialogProps {
   open: boolean
@@ -17,6 +18,7 @@ interface ConfirmDialogProps {
   onConfirm: () => void
   confirmText?: string
   cancelText?: string
+  loading?: boolean
 }
 
 export default function ConfirmDialog({
@@ -27,6 +29,7 @@ export default function ConfirmDialog({
   onConfirm,
   confirmText = 'Delete',
   cancelText = 'Cancel',
+  loading = false,
 }: ConfirmDialogProps) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -36,8 +39,9 @@ export default function ConfirmDialog({
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>{cancelText}</AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+          <AlertDialogCancel disabled={loading}>{cancelText}</AlertDialogCancel>
+          <AlertDialogAction onClick={onConfirm} disabled={loading} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {confirmText}
           </AlertDialogAction>
         </AlertDialogFooter>
