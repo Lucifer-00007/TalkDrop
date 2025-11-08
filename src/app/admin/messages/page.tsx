@@ -7,9 +7,9 @@ import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { getAllMessages, deleteMessage, deleteRoomMessages, type AdminMessage } from '@/lib/admin'
 import AdminLayout from '@/components/AdminLayout'
+import ConfirmDialog from '@/components/ConfirmDialog'
 
 export default function MessagesPage() {
   const [messages, setMessages] = useState<AdminMessage[]>([])
@@ -17,7 +17,9 @@ export default function MessagesPage() {
   const [filter, setFilter] = useState('')
   const [sortBy, setSortBy] = useState<'time-desc' | 'time-asc' | 'sender' | 'room'>('time-desc')
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [clearRoomDialogOpen, setClearRoomDialogOpen] = useState(false)
   const [selectedMessage, setSelectedMessage] = useState<AdminMessage | null>(null)
+  const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null)
 
   const loadMessages = useCallback(async () => {
     setLoading(true)
@@ -71,10 +73,14 @@ export default function MessagesPage() {
     }
   }
 
-  const handleDeleteRoom = async (roomId: string) => {
+  const handleDeleteRoom = async () => {
+    if (!selectedRoomId) return
+    
     try {
-      await deleteRoomMessages(roomId)
-      setMessages(prev => prev.filter(m => m.roomId !== roomId))
+      await deleteRoomMessages(selectedRoomId)
+      setMessages(prev => prev.filter(m => m.roomId !== selectedRoomId))
+      setClearRoomDialogOpen(false)
+      setSelectedRoomId(null)
     } catch (error) {
       console.error('Failed to delete room messages:', error)
     }
@@ -148,7 +154,10 @@ export default function MessagesPage() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handleDeleteRoom(message.roomId)}
+                        onClick={() => {
+                          setSelectedRoomId(message.roomId)
+                          setClearRoomDialogOpen(true)
+                        }}
                       >
                         Clear Room
                       </Button>
@@ -160,24 +169,22 @@ export default function MessagesPage() {
           </Table>
         </Card>
 
-        <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Delete Message</DialogTitle>
-              <DialogDescription>
-                Are you sure you want to delete this message? This action cannot be undone.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button variant="destructive" onClick={handleDeleteMessage}>
-                Delete
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <ConfirmDialog
+          open={deleteDialogOpen}
+          onOpenChange={setDeleteDialogOpen}
+          title="Delete Message"
+          description="Are you sure you want to delete this message? This action cannot be undone."
+          onConfirm={handleDeleteMessage}
+        />
+
+        <ConfirmDialog
+          open={clearRoomDialogOpen}
+          onOpenChange={setClearRoomDialogOpen}
+          title="Clear Room Messages"
+          description={`Are you sure you want to delete all messages in room ${selectedRoomId}? This action cannot be undone.`}
+          onConfirm={handleDeleteRoom}
+          confirmText="Delete All"
+        />
       </div>
     </AdminLayout>
   )
