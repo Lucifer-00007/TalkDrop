@@ -9,10 +9,9 @@ import { useEffect, useState } from 'react'
 
 interface AdminNavbarProps {
   activeTab: string
-  onTabChange: (tab: string) => void
 }
 
-export default function AdminNavbar({ activeTab, onTabChange }: AdminNavbarProps) {
+export default function AdminNavbar({ activeTab }: AdminNavbarProps) {
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
 
   useEffect(() => {
@@ -43,7 +42,7 @@ export default function AdminNavbar({ activeTab, onTabChange }: AdminNavbarProps
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="p-0 w-64">
-            <AdminSidebar activeTab={activeTab} onTabChange={onTabChange} />
+            <AdminSidebar activeTab={activeTab} />
           </SheetContent>
         </Sheet>
 

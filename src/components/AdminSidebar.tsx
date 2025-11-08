@@ -4,19 +4,20 @@ import { LayoutDashboard, MessageSquare, Settings, LogOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from './ui/button'
 import { auth } from '@/lib/firebase'
+import { useRouter } from 'next/navigation'
 
 interface AdminSidebarProps {
   activeTab: string
-  onTabChange: (tab: string) => void
 }
 
 const menuItems = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'messages', label: 'Messages', icon: MessageSquare },
-  { id: 'settings', label: 'Settings', icon: Settings },
+  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, href: '/admin' },
+  { id: 'messages', label: 'Messages', icon: MessageSquare, href: '/admin/messages' },
+  { id: 'settings', label: 'Settings', icon: Settings, href: '/admin/settings' },
 ]
 
-export default function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
+export default function AdminSidebar({ activeTab }: AdminSidebarProps) {
+  const router = useRouter()
   const handleSignOut = async () => {
     const authInstance = auth()
     if (authInstance) {
@@ -49,7 +50,7 @@ export default function AdminSidebar({ activeTab, onTabChange }: AdminSidebarPro
                 'w-full justify-start mb-1',
                 activeTab === item.id && 'bg-secondary'
               )}
-              onClick={() => onTabChange(item.id)}
+              onClick={() => router.push(item.href)}
             >
               <Icon className="h-4 w-4 mr-2" />
               {item.label}

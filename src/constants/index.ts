@@ -90,3 +90,8 @@ export const APP_NAME = 'TalkDrop'
 export const APP_TAGLINE = 'Instant chat rooms for quick conversations'
 export const MESSAGE_RETENTION = '24 hours'
 export const COPYRIGHT_YEAR = 2024
+
+export const ALLOWED_ADMIN_EMAILS = [
+  'files.backup.777@gmail.com',
+  'admin.files.backup.777@gmail.com'
+]
