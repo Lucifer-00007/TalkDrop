@@ -109,14 +109,14 @@ export default function HomePage() {
 
           {/* Main Action Card */}
           <div className="mb-20">
-            <Card className="max-w-md mx-auto">
+            <Card className="max-w-md mx-auto overflow-visible">
               <CardHeader>
                 <CardTitle className="text-center">Get Started</CardTitle>
                 <CardDescription className="text-center">
                   Enter your display name to create or join a room
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 pb-6">
                 <div>
                   <Input
                     placeholder="Your display name"
@@ -129,14 +129,14 @@ export default function HomePage() {
                 <div className="flex gap-2 p-1 bg-muted rounded-lg">
                   <Button
                     variant={mode === 'create' ? 'default' : 'ghost'}
-                    className="flex-1"
+                    className={`flex-1 ${mode !== 'create' ? 'dark:border dark:border-white/20' : ''}`}
                     onClick={() => setMode('create')}
                   >
                     Create New
                   </Button>
                   <Button
                     variant={mode === 'join' ? 'default' : 'ghost'}
-                    className="flex-1"
+                    className={`flex-1 ${mode !== 'join' ? 'dark:border dark:border-white/20' : ''}`}
                     onClick={() => setMode('join')}
                   >
                     Join Existing
