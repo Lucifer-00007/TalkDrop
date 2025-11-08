@@ -64,11 +64,10 @@ export default function MessagesPage() {
   return (
     <AdminLayout>
       <div className="p-6">
-        <div className="flex items-center gap-4 mb-6">
+        <div className="flex items-center gap-2 mb-6">
           <h1 className="text-2xl font-bold">Messages</h1>
           <Button onClick={loadMessages} disabled={loading} size="sm" variant="outline">
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-            Refresh
           </Button>
         </div>
 
@@ -105,7 +104,8 @@ export default function MessagesPage() {
                     <div className="flex gap-2">
                       <Button
                         size="sm"
-                        variant="destructive"
+                        variant="outline"
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950"
                         onClick={() => {
                           setSelectedMessage(message)
                           setDeleteDialogOpen(true)
