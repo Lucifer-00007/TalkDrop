@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { Trash2, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { getAllMessages, deleteMessage, deleteRoomMessages, type AdminMessage } from '@/lib/admin'
@@ -14,6 +15,7 @@ export default function MessagesPage() {
   const [messages, setMessages] = useState<AdminMessage[]>([])
   const [loading, setLoading] = useState(false)
   const [filter, setFilter] = useState('')
+  const [sortBy, setSortBy] = useState<'time-desc' | 'time-asc' | 'sender' | 'room'>('time-desc')
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [selectedMessage, setSelectedMessage] = useState<AdminMessage | null>(null)
 
@@ -33,11 +35,28 @@ export default function MessagesPage() {
     loadMessages()
   }, [loadMessages])
 
-  const filteredMessages = messages.filter(msg =>
-    msg.text.toLowerCase().includes(filter.toLowerCase()) ||
-    msg.senderName.toLowerCase().includes(filter.toLowerCase()) ||
-    msg.roomId.toLowerCase().includes(filter.toLowerCase())
-  )
+  const filteredMessages = useMemo(() => {
+    const filtered = messages.filter(msg =>
+      msg.text.toLowerCase().includes(filter.toLowerCase()) ||
+      msg.senderName.toLowerCase().includes(filter.toLowerCase()) ||
+      msg.roomId.toLowerCase().includes(filter.toLowerCase())
+    )
+
+    return filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'time-asc':
+          return (a.createdAt?.toMillis() || 0) - (b.createdAt?.toMillis() || 0)
+        case 'time-desc':
+          return (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0)
+        case 'sender':
+          return a.senderName.localeCompare(b.senderName)
+        case 'room':
+          return a.roomId.localeCompare(b.roomId)
+        default:
+          return 0
+      }
+    })
+  }, [messages, filter, sortBy])
 
   const handleDeleteMessage = async () => {
     if (!selectedMessage) return
@@ -72,12 +91,25 @@ export default function MessagesPage() {
         </div>
 
         <Card className="p-4 mb-6">
-          <Input
-            placeholder="Filter messages by content, sender, or room ID..."
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className="max-w-md"
-          />
+          <div className="flex gap-4">
+            <Input
+              placeholder="Filter messages by content, sender, or room ID..."
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="max-w-md"
+            />
+            <Select value={sortBy} onValueChange={(value: typeof sortBy) => setSortBy(value)}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="time-desc">Newest First</SelectItem>
+                <SelectItem value="time-asc">Oldest First</SelectItem>
+                <SelectItem value="sender">Sender (A-Z)</SelectItem>
+                <SelectItem value="room">Room ID (A-Z)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </Card>
 
         <Card>
@@ -105,13 +137,13 @@ export default function MessagesPage() {
                       <Button
                         size="sm"
                         variant="outline"
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950"
+                        className="border-red-600 text-red-600 hover:text-red-700 hover:bg-red-100 dark:hover:bg-red-950 px-2.5 py-1"
                         onClick={() => {
                           setSelectedMessage(message)
                           setDeleteDialogOpen(true)
                         }}
                       >
-                        <Trash2 className="h-3 w-3" />
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                       <Button
                         size="sm"
