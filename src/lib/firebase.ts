@@ -1,5 +1,5 @@
 import { initializeApp, FirebaseApp } from 'firebase/app'
-import { getAuth, Auth, connectAuthEmulator } from 'firebase/auth'
+import { getAuth, Auth, connectAuthEmulator, setPersistence, browserLocalPersistence } from 'firebase/auth'
 import { getDatabase, Database, connectDatabaseEmulator } from 'firebase/database'
 import { getFirestore, Firestore, connectFirestoreEmulator } from 'firebase/firestore'
 import { isFirebaseConfigured, FIREBASE_CONFIG_MISSING_MESSAGE } from './config'
@@ -47,6 +47,11 @@ const initializeFirebase = () => {
   auth = getAuth(app)
   rtdb = getDatabase(app)
   firestore = getFirestore(app)
+
+  // Set auth persistence
+  setPersistence(auth, browserLocalPersistence).catch((error) => {
+    console.error('Failed to set auth persistence:', error)
+  })
 
   // Connect to emulators in development
   if (useEmulator) {
