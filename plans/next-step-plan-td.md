@@ -11,7 +11,7 @@
 -------------------------------------------------
 ## Bugs
 
-- []
+- [] Test the create room id. And fix if any bug found
 - []
 - []
 - []
@@ -25,8 +25,8 @@
 -------------------------------------------------
 ## New features
 
-- []
-- []
+- [] Add a `profile` section in the admin to manage the logged in used.
+- [] 
 - []
 - []
 
