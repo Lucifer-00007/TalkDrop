@@ -11,38 +11,33 @@ import { Badge } from '@/components/ui/badge'
 import { Save, Database, Shield, Clock, Bell, RefreshCw } from 'lucide-react'
 import { collection, getDocs } from 'firebase/firestore'
 import { firestore } from '@/lib/firebase'
+import { DEFAULT_SETTINGS } from '@/constants'
 
 export default function SettingsPage() {
-  const [settings, setSettings] = useState({
-    messageRetention: '24',
-    maxRoomSize: '50',
-    autoDeleteInactive: true,
-    inactiveThreshold: '7',
-    allowAnonymous: true,
-    requireModeration: false,
-    enableNotifications: true,
-    maxMessageLength: '1000',
-  })
+  const [settings, setSettings] = useState(DEFAULT_SETTINGS)
   const [rooms, setRooms] = useState<Array<{ id: string; retention: string }>>([])
   const [saved, setSaved] = useState(false)
   const [loading, setLoading] = useState(false)
 
   const loadRooms = async () => {
     setLoading(true)
-    const firestoreInstance = firestore()
-    if (!firestoreInstance) {
-      setLoading(false)
-      return
+    try {
+      const firestoreInstance = firestore()
+      if (!firestoreInstance) {
+        setLoading(false)
+        return
+      }
+      
+      const snapshot = await getDocs(collection(firestoreInstance, 'rooms'))
+      setRooms(snapshot.docs.map(doc => ({ id: doc.id, retention: '24' })))
+    } catch (error) {
+      console.error('Failed to load rooms:', error)
+      setRooms([])
     }
-    
-    const snapshot = await getDocs(collection(firestoreInstance, 'rooms'))
-    setRooms(snapshot.docs.map(doc => ({ id: doc.id, retention: '24' })))
     setLoading(false)
   }
 
-  useEffect(() => {
-    loadRooms()
-  }, [])
+
 
   const handleSave = () => {
     // In a real app, save to Firebase/backend
@@ -68,7 +63,7 @@ export default function SettingsPage() {
               <CardDescription>Control how messages and rooms are stored</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
+              <div className="space-y-2 border border-gray-200 dark:border-gray-700 rounded-md p-4">
                 <label className="text-sm font-medium">Message Retention Period</label>
                 <Select value={settings.messageRetention} onValueChange={(v) => setSettings({...settings, messageRetention: v})}>
                   <SelectTrigger>
@@ -86,7 +81,7 @@ export default function SettingsPage() {
                 <p className="text-xs text-muted-foreground">Messages older than this will be automatically deleted</p>
               </div>
 
-              <div className="flex items-center justify-between border border-gray-200 rounded-md p-4">
+              <div className="flex items-center justify-between border border-gray-200 dark:border-gray-700 rounded-md p-4">
                 <div className="space-y-0.5">
                   <label className="text-sm font-medium">Auto-delete Inactive Rooms</label>
                   <p className="text-xs text-muted-foreground">Remove rooms with no activity</p>
@@ -95,16 +90,16 @@ export default function SettingsPage() {
               </div>
 
               {settings.autoDeleteInactive && (
-                <div className="space-y-2 border border-gray-200 rounded-md p-4">
+                <div className="space-y-2 border border-gray-200 dark:border-gray-700 rounded-md p-4">
                   <label className="text-sm font-medium">Inactivity Threshold (days)</label>
                   <Input type="number" value={settings.inactiveThreshold} onChange={(e) => setSettings({...settings, inactiveThreshold: e.target.value})} />
                 </div>
               )}
 
-              <div className="space-y-3 pt-2 border border-gray-200 rounded-md p-4">
-                <div className="flex items-center justify-between">
+              <div className="border border-gray-200 dark:border-gray-700 rounded-md p-4">
+                <div className="flex items-center justify-between mb-3">
                   <label className="text-sm font-medium">Per-Room Retention</label>
-                  <Button variant="ghost" size="sm" onClick={loadRooms} disabled={loading}>
+                  <Button variant="ghost" size="sm" onClick={loadRooms} disabled={loading} className="h-7 w-7 p-0">
                     <RefreshCw className={`h-3 w-3 ${loading ? 'animate-spin' : ''}`} />
                   </Button>
                 </div>

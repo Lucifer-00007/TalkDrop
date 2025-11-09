@@ -95,3 +95,14 @@ export const ALLOWED_ADMIN_EMAILS = [
   'files.backup.777@gmail.com',
   'admin.files.backup.777@gmail.com'
 ]
+
+export const DEFAULT_SETTINGS = {
+  messageRetention: '24',
+  maxRoomSize: '50',
+  autoDeleteInactive: true,
+  inactiveThreshold: '7',
+  allowAnonymous: true,
+  requireModeration: false,
+  enableNotifications: true,
+  maxMessageLength: '1000',
+}
