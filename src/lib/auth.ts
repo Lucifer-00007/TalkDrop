@@ -8,6 +8,17 @@ const validateAdminEmail = (email: string | null) => {
   }
 }
 
+export const getAuthErrorMessage = (error: any): string => {
+  const message = error.message || error.toString()
+  if (message.includes('auth/invalid-credential') || message.includes('auth/wrong-password') || message.includes('auth/user-not-found')) {
+    return 'Invalid credentials'
+  }
+  if (message.includes('Unauthorized')) {
+    return message
+  }
+  return 'Authentication failed. Please try again.'
+}
+
 export const signInAnonymous = async (): Promise<User> => {
   const authInstance = auth()
   if (!authInstance) {

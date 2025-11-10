@@ -5,18 +5,8 @@ import { Shield, Mail, Eye, EyeOff, Moon, Sun } from 'lucide-react'
 import { Button } from './ui/button'
 import { Card } from './ui/card'
 import { Input } from './ui/input'
-import { signInWithEmail, signInWithGoogle } from '@/lib/auth'
-
-const getErrorMessage = (error: any): string => {
-  const message = error.message || error.toString()
-  if (message.includes('auth/invalid-credential') || message.includes('auth/wrong-password') || message.includes('auth/user-not-found')) {
-    return 'Invalid credentials'
-  }
-  if (message.includes('Unauthorized')) {
-    return message
-  }
-  return 'Authentication failed. Please try again.'
-}
+import { signInWithEmail, signInWithGoogle, getAuthErrorMessage } from '@/lib/auth'
+import { getTheme, toggleTheme, initTheme } from '@/lib/theme'
 
 export default function AdminAuth() {
   const [email, setEmail] = useState('')
@@ -27,22 +17,13 @@ export default function AdminAuth() {
   const [isDark, setIsDark] = useState(false)
 
   useEffect(() => {
-    const theme = localStorage.getItem('theme')
-    setIsDark(theme === 'dark')
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark')
-    }
+    initTheme()
+    setIsDark(getTheme() === 'dark')
   }, [])
 
-  const toggleTheme = () => {
-    setIsDark(!isDark)
-    if (!isDark) {
-      document.documentElement.classList.add('dark')
-      localStorage.setItem('theme', 'dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-      localStorage.setItem('theme', 'light')
-    }
+  const handleToggleTheme = () => {
+    const newTheme = toggleTheme()
+    setIsDark(newTheme === 'dark')
   }
 
   const handleEmailAuth = async () => {
@@ -51,7 +32,7 @@ export default function AdminAuth() {
     try {
       await signInWithEmail(email, password)
     } catch (err: any) {
-      setError(getErrorMessage(err))
+      setError(getAuthErrorMessage(err))
     } finally {
       setLoading(false)
     }
@@ -63,7 +44,7 @@ export default function AdminAuth() {
     try {
       await signInWithGoogle()
     } catch (err: any) {
-      setError(getErrorMessage(err))
+      setError(getAuthErrorMessage(err))
     } finally {
       setLoading(false)
     }
@@ -74,7 +55,7 @@ export default function AdminAuth() {
       <Button
         variant="ghost"
         size="icon"
-        onClick={toggleTheme}
+        onClick={handleToggleTheme}
         className="fixed top-4 right-4 dark:text-white"
       >
         {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}

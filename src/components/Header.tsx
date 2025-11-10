@@ -4,27 +4,19 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { MessageCircle, Moon, Sun } from 'lucide-react'
 import { APP_NAME } from '@/constants'
+import { getTheme, toggleTheme, initTheme } from '@/lib/theme'
 
 export default function Header() {
   const [isDark, setIsDark] = useState(false)
 
   useEffect(() => {
-    const theme = localStorage.getItem('theme')
-    setIsDark(theme === 'dark')
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark')
-    }
+    initTheme()
+    setIsDark(getTheme() === 'dark')
   }, [])
 
-  const toggleTheme = () => {
-    setIsDark(!isDark)
-    if (!isDark) {
-      document.documentElement.classList.add('dark')
-      localStorage.setItem('theme', 'dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-      localStorage.setItem('theme', 'light')
-    }
+  const handleToggleTheme = () => {
+    const newTheme = toggleTheme()
+    setIsDark(newTheme === 'dark')
   }
 
   return (
@@ -36,7 +28,7 @@ export default function Header() {
       <Button
         variant="ghost"
         size="icon"
-        onClick={toggleTheme}
+        onClick={handleToggleTheme}
         className="dark:text-white"
       >
         {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
