@@ -9,13 +9,22 @@ export const useAuth = () => {
   const [displayName, setDisplayName] = useState<string>('')
 
   useEffect(() => {
+    if (typeof window === 'undefined') {
+      setLoading(false)
+      return
+    }
+    
+    console.log('[useAuth] Initializing auth...')
     const authInstance = auth()
+    console.log('[useAuth] Auth instance:', authInstance ? 'initialized' : 'null')
     if (!authInstance) {
+      console.error('[useAuth] Firebase auth not initialized')
       setLoading(false)
       return
     }
 
     const unsubscribe = onAuthStateChanged(authInstance, (user) => {
+      console.log('[useAuth] Auth state changed:', user?.email || 'no user')
       setUser(user)
       setLoading(false)
     })

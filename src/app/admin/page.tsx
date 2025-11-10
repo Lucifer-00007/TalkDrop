@@ -6,27 +6,33 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { getDashboardStats, type DashboardStats } from '@/lib/admin-stats'
 import { MessageSquare, Users, Activity, TrendingUp, Loader2 } from 'lucide-react'
+import { useAuth } from '@/hooks/useAuth'
 
 export default function AdminPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [loading, setLoading] = useState(true)
+  const { user } = useAuth()
 
   useEffect(() => {
+    if (!user) return
+    
     const loadStats = async () => {
       try {
+        console.log('[Admin Page] Loading dashboard stats...')
         const data = await getDashboardStats()
+        console.log('[Admin Page] Stats loaded:', data)
         setStats(data)
       } catch (error) {
-        console.error('Failed to load stats:', error)
+        console.error('[Admin Page] Failed to load stats:', error)
       } finally {
         setLoading(false)
       }
     }
 
     loadStats()
-    const interval = setInterval(loadStats, 30000) // Refresh every 30s
+    const interval = setInterval(loadStats, 30000)
     return () => clearInterval(interval)
-  }, [])
+  }, [user])
 
   if (loading) {
     return (

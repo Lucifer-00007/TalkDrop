@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { Shield, Mail, Eye, EyeOff } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Shield, Mail, Eye, EyeOff, Moon, Sun } from 'lucide-react'
 import { Button } from './ui/button'
 import { Card } from './ui/card'
 import { Input } from './ui/input'
@@ -24,6 +24,26 @@ export default function AdminAuth() {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [isDark, setIsDark] = useState(false)
+
+  useEffect(() => {
+    const theme = localStorage.getItem('theme')
+    setIsDark(theme === 'dark')
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark')
+    }
+  }, [])
+
+  const toggleTheme = () => {
+    setIsDark(!isDark)
+    if (!isDark) {
+      document.documentElement.classList.add('dark')
+      localStorage.setItem('theme', 'dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+      localStorage.setItem('theme', 'light')
+    }
+  }
 
   const handleEmailAuth = async () => {
     setLoading(true)
@@ -51,6 +71,14 @@ export default function AdminAuth() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={toggleTheme}
+        className="fixed top-4 right-4 dark:text-white"
+      >
+        {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+      </Button>
       <Card className="w-full max-w-md">
         <div className="p-6 space-y-4">
           <div className="flex items-center gap-2 justify-center">

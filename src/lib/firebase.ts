@@ -13,7 +13,9 @@ let initialized = false
 const initializeFirebase = () => {
   if (initialized || typeof window === 'undefined') return
   
+  console.log('[Firebase] Initializing...')
   const useEmulator = process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === 'true'
+  console.log('[Firebase] Use emulator:', useEmulator)
   
   let firebaseConfig
   if (useEmulator) {
@@ -29,9 +31,10 @@ const initializeFirebase = () => {
     }
   } else {
     if (!isFirebaseConfigured()) {
-      console.warn(FIREBASE_CONFIG_MISSING_MESSAGE)
+      console.error('[Firebase] Configuration missing:', FIREBASE_CONFIG_MISSING_MESSAGE)
       return
     }
+    console.log('[Firebase] Using production config')
     firebaseConfig = {
       apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '',
       authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || '',
@@ -43,10 +46,16 @@ const initializeFirebase = () => {
     }
   }
 
-  app = initializeApp(firebaseConfig)
-  auth = getAuth(app)
-  rtdb = getDatabase(app)
-  firestore = getFirestore(app)
+  try {
+    app = initializeApp(firebaseConfig)
+    auth = getAuth(app)
+    rtdb = getDatabase(app)
+    firestore = getFirestore(app)
+    console.log('[Firebase] Initialized successfully')
+  } catch (error) {
+    console.error('[Firebase] Initialization failed:', error)
+    return
+  }
 
   // Set auth persistence
   setPersistence(auth, browserLocalPersistence).catch((error) => {
@@ -66,6 +75,7 @@ const initializeFirebase = () => {
   }
   
   initialized = true
+  console.log('[Firebase] Setup complete')
 }
 
 const getFirebaseAuth = () => {

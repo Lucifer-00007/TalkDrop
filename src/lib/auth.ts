@@ -37,11 +37,15 @@ export const signInWithGoogle = async (): Promise<User> => {
   const authInstance = auth()
   if (!authInstance) throw new Error('Firebase auth not initialized')
   const provider = new GoogleAuthProvider()
+  console.log('[Auth] Starting Google sign-in...')
   const result = await signInWithPopup(authInstance, provider)
+  console.log('[Auth] Google sign-in successful, email:', result.user.email)
   try {
     validateAdminEmail(result.user.email)
+    console.log('[Auth] Email validated successfully')
     return result.user
   } catch (error) {
+    console.error('[Auth] Email validation failed:', error)
     await authInstance.signOut()
     throw error
   }

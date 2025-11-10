@@ -10,6 +10,7 @@ import { Loader2 } from 'lucide-react'
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
   const pathname = usePathname()
+  
 
   const getActiveTab = () => {
     if (pathname === '/admin') return 'dashboard'

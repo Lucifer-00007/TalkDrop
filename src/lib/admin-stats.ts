@@ -16,7 +16,9 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
   
   if (!firestoreInstance) throw new Error('Firebase Firestore not initialized')
 
+  console.log('[Admin Stats] Fetching rooms...')
   const roomsSnapshot = await getDocs(collection(firestoreInstance, 'rooms'))
+  console.log('[Admin Stats] Rooms fetched:', roomsSnapshot.size)
   const totalRooms = roomsSnapshot.size
 
   let totalMessages = 0
@@ -24,9 +26,11 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
   const yesterday = Timestamp.fromDate(new Date(Date.now() - 24 * 60 * 60 * 1000))
 
   for (const roomDoc of roomsSnapshot.docs) {
+    console.log('[Admin Stats] Fetching messages for room:', roomDoc.id)
     const messagesSnapshot = await getDocs(
       collection(firestoreInstance, 'rooms', roomDoc.id, 'messages')
     )
+    console.log('[Admin Stats] Messages fetched for', roomDoc.id, ':', messagesSnapshot.size)
     totalMessages += messagesSnapshot.size
 
     const recentMessages = await getDocs(
