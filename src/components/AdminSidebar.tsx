@@ -1,6 +1,6 @@
 'use client'
 
-import { LayoutDashboard, MessageSquare, Settings, LogOut } from 'lucide-react'
+import { LayoutDashboard, MessageSquare, Settings, User, LogOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from './ui/button'
 import { auth } from '@/lib/firebase'
@@ -14,6 +14,7 @@ const menuItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, href: '/admin' },
   { id: 'messages', label: 'Messages', icon: MessageSquare, href: '/admin/messages' },
   { id: 'settings', label: 'Settings', icon: Settings, href: '/admin/settings' },
+  { id: 'profile', label: 'Profile', icon: User, href: '/admin/profile' },
 ]
 
 export default function AdminSidebar({ activeTab }: AdminSidebarProps) {

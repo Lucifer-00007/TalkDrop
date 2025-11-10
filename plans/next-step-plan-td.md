@@ -11,9 +11,9 @@
 -------------------------------------------------
 ## Bugs
 
-- [] Test the create room id. And fix if any bug found
-- []
-- []
+- [] Test the create room id. And fix if any bug found.
+- [] When i am in `admin/profile` page the profile should be highlighted from the admin sidebar. 
+- [] Use gid layout and allign all(title, grids, etc) to the center in admin/profile 
 - []
 
 ## Mobile View
@@ -25,7 +25,7 @@
 -------------------------------------------------
 ## New features
 
-- [] Add a `profile` section in the admin to manage the logged in used.
+- [x] Add a `profile` section in the admin to manage the logged in used.
 - [] 
 - []
 - []
