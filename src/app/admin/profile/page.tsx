@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Loader2, Mail, Shield, Calendar, LogOut } from 'lucide-react'
+import { Loader2, Mail, Shield, Calendar, LogOut, Edit2, Copy, Check } from 'lucide-react'
 import { auth } from '@/lib/firebase'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -16,6 +16,13 @@ export default function ProfilePage() {
   const { user, loading } = useAuth()
   const router = useRouter()
   const [displayName, setDisplayName] = useState('')
+  const [copied, setCopied] = useState(false)
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   const handleSignOut = async () => {
     const authInstance = auth()
@@ -55,53 +62,78 @@ export default function ProfilePage() {
                 <CardTitle>Account Information</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <Avatar className="h-20 w-20">
-                    <AvatarFallback className="text-2xl">{initials}</AvatarFallback>
-                  </Avatar>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <h2 className="text-2xl font-semibold">{user?.email || 'Admin'}</h2>
-                      <Badge variant="default" className="gap-1">
-                        <Shield className="h-3 w-3" />
-                        Admin
-                      </Badge>
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-4">
+                    <Avatar className="h-24 w-24 border-2 border-primary/20">
+                      <AvatarFallback className="text-3xl bg-gradient-to-br from-primary to-primary/60">{initials}</AvatarFallback>
+                    </Avatar>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <h2 className="text-2xl font-bold">{user?.email || 'Admin'}</h2>
+                        <Badge variant="default" className="gap-1">
+                          <Shield className="h-3 w-3" />
+                          Admin
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground">Administrator Account</p>
                     </div>
-                    <p className="text-sm text-muted-foreground">Administrator Account</p>
                   </div>
+                  <Button variant="outline" size="sm" className="gap-2">
+                    <Edit2 className="h-4 w-4" />
+                    Edit Profile
+                  </Button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t">
-                  <div className="flex items-center gap-3">
-                    <Mail className="h-4 w-4 text-muted-foreground" />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t">
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                    <div className="p-2 rounded-md bg-background">
+                      <Mail className="h-5 w-5 text-primary" />
+                    </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium">Email</p>
-                      <p className="text-sm text-muted-foreground">{user?.email || 'Not set'}</p>
+                      <p className="text-xs font-medium text-muted-foreground mb-1">Email</p>
+                      <p className="text-sm font-medium break-all">{user?.email || 'Not set'}</p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                    <div className="p-2 rounded-md bg-background">
+                      <Calendar className="h-5 w-5 text-primary" />
+                    </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium">Account Created</p>
-                      <p className="text-sm text-muted-foreground">{createdAt}</p>
+                      <p className="text-xs font-medium text-muted-foreground mb-1">Account Created</p>
+                      <p className="text-sm font-medium">{createdAt}</p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3">
-                    <Shield className="h-4 w-4 text-muted-foreground" />
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                    <div className="p-2 rounded-md bg-background">
+                      <Shield className="h-5 w-5 text-primary" />
+                    </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium">User ID</p>
-                      <p className="text-sm text-muted-foreground font-mono">{user?.uid}</p>
+                      <p className="text-xs font-medium text-muted-foreground mb-1">User ID</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-medium font-mono break-all flex-1">{user?.uid}</p>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 w-6 p-0"
+                          onClick={() => copyToClipboard(user?.uid || '')}
+                        >
+                          {copied ? <Check className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3" />}
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border-primary/20">
               <CardHeader>
-                <CardTitle>Display Name</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <Edit2 className="h-5 w-5" />
+                  Display Name
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex gap-2">
@@ -109,8 +141,12 @@ export default function ProfilePage() {
                     placeholder="Enter display name"
                     value={displayName}
                     onChange={(e) => setDisplayName(e.target.value)}
+                    className="flex-1"
                   />
-                  <Button disabled>Update</Button>
+                  <Button disabled className="gap-2">
+                    <Check className="h-4 w-4" />
+                    Update
+                  </Button>
                 </div>
                 <p className="text-xs text-muted-foreground">
                   This name will be displayed in the admin panel
@@ -118,20 +154,23 @@ export default function ProfilePage() {
               </CardContent>
             </Card>
 
-            <Card className="border-destructive/50">
+            <Card className="border-destructive/50 bg-destructive/5">
               <CardHeader>
-                <CardTitle className="text-destructive">Danger Zone</CardTitle>
+                <CardTitle className="text-destructive flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  Danger Zone
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between p-3 rounded-lg border border-destructive/20">
                   <div>
-                    <p className="font-medium">Sign Out</p>
+                    <p className="font-semibold">Sign Out</p>
                     <p className="text-sm text-muted-foreground">
                       Sign out from your admin account
                     </p>
                   </div>
-                  <Button variant="destructive" onClick={handleSignOut}>
-                    <LogOut className="h-4 w-4 mr-2" />
+                  <Button variant="destructive" onClick={handleSignOut} className="gap-2">
+                    <LogOut className="h-4 w-4" />
                     Sign Out
                   </Button>
                 </div>
