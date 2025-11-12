@@ -88,47 +88,67 @@ export default function UsersPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-3">
-                  <div className="p-3 rounded-lg bg-primary/10">
-                    <UsersIcon className="h-6 w-6 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold">{users.length}</p>
-                    <p className="text-sm text-muted-foreground">Total Users</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            {loading ? (
+              Array.from({ length: 3 }).map((_, i) => (
+                <Card key={i}>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center gap-3">
+                      <div className="p-3 rounded-lg bg-muted animate-pulse">
+                        <div className="h-6 w-6 bg-muted-foreground/20 rounded" />
+                      </div>
+                      <div>
+                        <div className="h-8 w-12 bg-muted animate-pulse rounded mb-1" />
+                        <div className="h-4 w-16 bg-muted animate-pulse rounded" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              <>
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center gap-3">
+                      <div className="p-3 rounded-lg bg-primary/10">
+                        <UsersIcon className="h-6 w-6 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold">{users.length}</p>
+                        <p className="text-sm text-muted-foreground">Total Users</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
 
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-3">
-                  <div className="p-3 rounded-lg bg-green-500/10">
-                    <UserCheck className="h-6 w-6 text-green-500" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold">{onlineUsers.length}</p>
-                    <p className="text-sm text-muted-foreground">Online</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center gap-3">
+                      <div className="p-3 rounded-lg bg-green-500/10">
+                        <UserCheck className="h-6 w-6 text-green-500" />
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold">{onlineUsers.length}</p>
+                        <p className="text-sm text-muted-foreground">Online</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
 
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-3">
-                  <div className="p-3 rounded-lg bg-muted">
-                    <UserX className="h-6 w-6 text-muted-foreground" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold">{offlineUsers.length}</p>
-                    <p className="text-sm text-muted-foreground">Offline</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center gap-3">
+                      <div className="p-3 rounded-lg bg-muted">
+                        <UserX className="h-6 w-6 text-muted-foreground" />
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold">{offlineUsers.length}</p>
+                        <p className="text-sm text-muted-foreground">Offline</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </>
+            )}
           </div>
 
           <Card>
@@ -148,7 +168,23 @@ export default function UsersPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {filteredUsers.length === 0 ? (
+                {loading ? (
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <div key={i} className="flex items-center justify-between p-4 rounded-lg border bg-card">
+                      <div className="flex items-center gap-4">
+                        <div className="h-12 w-12 bg-muted animate-pulse rounded-full" />
+                        <div>
+                          <div className="h-4 w-24 bg-muted animate-pulse rounded mb-2" />
+                          <div className="h-3 w-32 bg-muted animate-pulse rounded" />
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="h-5 w-12 bg-muted animate-pulse rounded" />
+                        <div className="h-3 w-20 bg-muted animate-pulse rounded" />
+                      </div>
+                    </div>
+                  ))
+                ) : filteredUsers.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     No users found
                   </div>

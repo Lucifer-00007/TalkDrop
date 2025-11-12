@@ -91,6 +91,11 @@ export const APP_TAGLINE = 'Instant chat rooms for quick conversations'
 export const MESSAGE_RETENTION = '24 hours'
 export const COPYRIGHT_YEAR = 2024
 
+export const APP_METADATA = {
+  title: `${APP_NAME} - Instant Chat Rooms`,
+  description: 'Create and join instant chat rooms with real-time messaging',
+}
+
 export const ALLOWED_ADMIN_EMAILS = [
   'files.backup.777@gmail.com',
   'admin.files.backup.777@gmail.com'

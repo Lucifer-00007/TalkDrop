@@ -137,41 +137,59 @@ export default function MessagesPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredMessages.map((message) => (
-                <TableRow key={`${message.roomId}-${message.id}`}>
-                  <TableCell className="font-mono text-xs">{message.roomId}</TableCell>
-                  <TableCell>{message.senderName}</TableCell>
-                  <TableCell className="max-w-xs truncate">{message.text}</TableCell>
-                  <TableCell className="text-xs">
-                    {message.createdAt?.toDate().toLocaleString() || 'N/A'}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="border-red-600 text-red-600 hover:text-red-700 hover:bg-red-100 dark:hover:bg-red-950 px-2.5 py-1"
-                        onClick={() => {
-                          setSelectedMessage(message)
-                          setDeleteDialogOpen(true)
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => {
-                          setSelectedRoomId(message.roomId)
-                          setClearRoomDialogOpen(true)
-                        }}
-                      >
-                        Clear Room
-                      </Button>
-                    </div>
+              {loading ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell><div className="h-4 bg-muted animate-pulse rounded" /></TableCell>
+                    <TableCell><div className="h-4 bg-muted animate-pulse rounded" /></TableCell>
+                    <TableCell><div className="h-4 bg-muted animate-pulse rounded" /></TableCell>
+                    <TableCell><div className="h-4 bg-muted animate-pulse rounded" /></TableCell>
+                    <TableCell><div className="h-8 bg-muted animate-pulse rounded" /></TableCell>
+                  </TableRow>
+                ))
+              ) : filteredMessages.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                    No messages found
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                filteredMessages.map((message) => (
+                  <TableRow key={`${message.roomId}-${message.id}`}>
+                    <TableCell className="font-mono text-xs">{message.roomId}</TableCell>
+                    <TableCell>{message.senderName}</TableCell>
+                    <TableCell className="max-w-xs truncate">{message.text}</TableCell>
+                    <TableCell className="text-xs">
+                      {message.createdAt?.toDate().toLocaleString() || 'N/A'}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="border-red-600 text-red-600 hover:text-red-700 hover:bg-red-100 dark:hover:bg-red-950 px-2.5 py-1"
+                          onClick={() => {
+                            setSelectedMessage(message)
+                            setDeleteDialogOpen(true)
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setSelectedRoomId(message.roomId)
+                            setClearRoomDialogOpen(true)
+                          }}
+                        >
+                          Clear Room
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </Card>
