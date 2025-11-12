@@ -95,7 +95,8 @@ export default function MessagesPage() {
 
   return (
     <AdminLayout>
-      <div className="p-6">
+      <div className="p-6 flex flex-col items-center">
+        <div className="w-full max-w-6xl space-y-6">
         <div className="flex items-center gap-2 mb-6">
           <h1 className="text-2xl font-bold">Messages</h1>
           <Button onClick={loadMessages} disabled={loading} size="sm" variant="outline">
@@ -129,22 +130,22 @@ export default function MessagesPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Room ID</TableHead>
-                <TableHead>Sender</TableHead>
-                <TableHead>Message</TableHead>
-                <TableHead>Time</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead className="text-center">Room ID</TableHead>
+                <TableHead className="text-center">Sender</TableHead>
+                <TableHead className="text-center">Message</TableHead>
+                <TableHead className="text-center">Time</TableHead>
+                <TableHead className="text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <TableRow key={i}>
-                    <TableCell><div className="h-4 bg-muted animate-pulse rounded" /></TableCell>
-                    <TableCell><div className="h-4 bg-muted animate-pulse rounded" /></TableCell>
-                    <TableCell><div className="h-4 bg-muted animate-pulse rounded" /></TableCell>
-                    <TableCell><div className="h-4 bg-muted animate-pulse rounded" /></TableCell>
-                    <TableCell><div className="h-8 bg-muted animate-pulse rounded" /></TableCell>
+                    <TableCell className="text-center"><div className="h-4 bg-muted animate-pulse rounded" /></TableCell>
+                    <TableCell className="text-center"><div className="h-4 bg-muted animate-pulse rounded" /></TableCell>
+                    <TableCell className="text-center"><div className="h-4 bg-muted animate-pulse rounded" /></TableCell>
+                    <TableCell className="text-center"><div className="h-4 bg-muted animate-pulse rounded" /></TableCell>
+                    <TableCell className="text-center"><div className="h-8 bg-muted animate-pulse rounded" /></TableCell>
                   </TableRow>
                 ))
               ) : filteredMessages.length === 0 ? (
@@ -156,13 +157,13 @@ export default function MessagesPage() {
               ) : (
                 filteredMessages.map((message) => (
                   <TableRow key={`${message.roomId}-${message.id}`}>
-                    <TableCell className="font-mono text-xs">{message.roomId}</TableCell>
-                    <TableCell>{message.senderName}</TableCell>
-                    <TableCell className="max-w-xs truncate">{message.text}</TableCell>
-                    <TableCell className="text-xs">
+                    <TableCell className="font-mono text-xs text-center">{message.roomId}</TableCell>
+                    <TableCell className="text-center">{message.senderName}</TableCell>
+                    <TableCell className="max-w-xs truncate text-center">{message.text}</TableCell>
+                    <TableCell className="text-xs text-center">
                       {message.createdAt?.toDate().toLocaleString() || 'N/A'}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-center">
                       <div className="flex gap-2">
                         <Button
                           size="sm"
@@ -193,6 +194,7 @@ export default function MessagesPage() {
             </TableBody>
           </Table>
         </Card>
+        </div>
 
         <ConfirmDialog
           open={deleteDialogOpen}
