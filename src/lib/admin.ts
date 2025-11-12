@@ -1,8 +1,7 @@
-import { collection, query, orderBy, limit, getDocs, doc, deleteDoc, where } from 'firebase/firestore'
-import { ref, remove, get } from 'firebase/database'
+import { collection, query, orderBy, limit, getDocs, doc, deleteDoc } from 'firebase/firestore'
+import { ref, remove } from 'firebase/database'
 import { firestore, rtdb } from './firebase'
 import type { FirestoreMessage } from './firestore'
-import type { RTDBMessage } from './rtdb'
 
 export interface AdminMessage extends FirestoreMessage {
   id: string

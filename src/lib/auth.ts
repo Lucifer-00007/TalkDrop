@@ -8,8 +8,8 @@ const validateAdminEmail = (email: string | null) => {
   }
 }
 
-export const getAuthErrorMessage = (error: any): string => {
-  const message = error.message || error.toString()
+export const getAuthErrorMessage = (error: unknown): string => {
+  const message = error instanceof Error ? error.message : String(error)
   if (message.includes('auth/invalid-credential') || message.includes('auth/wrong-password') || message.includes('auth/user-not-found')) {
     return 'Invalid credentials'
   }

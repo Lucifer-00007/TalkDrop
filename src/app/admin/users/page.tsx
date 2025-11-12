@@ -6,10 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Loader2, Search, Users as UsersIcon, UserCheck, UserX, Shield } from 'lucide-react'
+import { Loader2, Search, Users as UsersIcon, UserCheck, UserX } from 'lucide-react'
 import { rtdb } from '@/lib/firebase'
-import { ref, onValue, off } from 'firebase/database'
+import { ref, onValue } from 'firebase/database'
 
 interface User {
   uid: string
@@ -34,15 +33,16 @@ export default function UsersPage() {
       const usersMap = new Map<string, User>()
       
       if (data) {
-        Object.values(data).forEach((room: any) => {
-          if (room.presence) {
-            Object.entries(room.presence).forEach(([uid, userData]: [string, any]) => {
+        Object.values(data as Record<string, unknown>).forEach((room) => {
+          const roomData = room as Record<string, unknown>
+          if (roomData.presence) {
+            Object.entries(roomData.presence as Record<string, Record<string, unknown>>).forEach(([uid, userData]) => {
               const existing = usersMap.get(uid)
-              if (!existing || userData.lastSeen > existing.lastSeen) {
+              if (!existing || (userData.lastSeen && Number(userData.lastSeen) > existing.lastSeen)) {
                 usersMap.set(uid, {
                   uid,
-                  displayName: userData.displayName || 'Anonymous',
-                  lastSeen: userData.lastSeen || Date.now(),
+                  displayName: String(userData.displayName || 'Anonymous'),
+                  lastSeen: Number(userData.lastSeen) || Date.now(),
                   status: userData.online ? 'online' : 'offline',
                 })
               }
@@ -56,7 +56,7 @@ export default function UsersPage() {
     })
 
     return () => {
-      off(roomsRef)
+      unsubscribe()
     }
   }, [])
 

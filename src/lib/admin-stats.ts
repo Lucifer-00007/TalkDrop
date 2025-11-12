@@ -50,8 +50,8 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
       const presenceSnapshot = await get(ref(rtdbInstance, `rooms/${roomDoc.id}/presence`))
       if (presenceSnapshot.exists()) {
         const presenceData = presenceSnapshot.val()
-        const onlineUsers = Object.values(presenceData).filter(
-          (p: any) => p.online
+        const onlineUsers = Object.values(presenceData as Record<string, { online?: boolean }>).filter(
+          (p) => p.online
         ).length
         if (onlineUsers > 0) {
           activeRooms++

@@ -31,7 +31,7 @@ export default function AdminAuth() {
     setError('')
     try {
       await signInWithEmail(email, password)
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(getAuthErrorMessage(err))
     } finally {
       setLoading(false)
@@ -43,7 +43,7 @@ export default function AdminAuth() {
     setError('')
     try {
       await signInWithGoogle()
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(getAuthErrorMessage(err))
     } finally {
       setLoading(false)

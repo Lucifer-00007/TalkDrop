@@ -1,7 +1,7 @@
 import RoomPageClient from '@/components/RoomPageClient'
-import { DUMMY_ROOMS, DYNAMIC_PARAMS } from '@/constants'
+import { DUMMY_ROOMS } from '@/constants'
 
-export const dynamicParams = DYNAMIC_PARAMS
+export const dynamicParams = false
 
 export async function generateStaticParams() {
   return DUMMY_ROOMS.map(room => ({ id: room.id }))
