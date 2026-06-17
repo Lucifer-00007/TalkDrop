@@ -95,7 +95,7 @@
 
 - [x] Enhance the loader and use skeletal loader when clicked on `Create New Room` or `Join` or when loading the room from room id and URL etc.
 
-- [] Create a script inside the ./scripts/ directory that checks all files under ./src and reports any file that exceeds 500 lines.
+- [x] Create a script inside the ./scripts/ directory that checks all files under ./src and reports any file that exceeds 500 lines.
 
 	Requirements:
 		- Ignore the ./src/components/ui/ directory completely.
@@ -117,7 +117,33 @@
 		- Make the script easy to run and understand.
 		- Ensure the output is clear and actionable.
 
+- [x] Review the ./src/ codebase and identify files, modules, or components that appear to be stale, outdated, unused, or safe to remove.
 
+	Requirements:
+		- Inspect the source tree under ./src/ thoroughly.
+		- Detect files that are no longer referenced anywhere in the codebase.
+		- Flag code that appears deprecated, duplicated, dead, or clearly superseded by newer implementations.
+		- Do not mark something as removable unless there is reasonable evidence that it is unused or obsolete.
+		- Exclude false positives caused by dynamic imports, route-based usage, runtime reflection, or generated code.
+		- For each candidate, provide:
+		  - file path
+		  - reason it appears unused or outdated
+		  - any references found, or note that none were found
+		  - a confidence level: high / medium / low
+		- Group findings by confidence and priority.
+		- Clearly separate “safe to remove” candidates from “needs manual review”.
+		- If there are no obvious candidates, say so explicitly.
+
+	Output format:
+		1. Summary
+		2. Safe to remove
+		3. Needs manual review
+		4. Notes on why each item was flagged
+
+	Make the analysis practical, conservative, and focused on minimizing the risk of deleting active code.
+
+- [] ./md-docs/DEAD_CODE_ANALYSIS.md - Review this manually and give the AI to make the fixes
+- []
 - []
 - []
 
