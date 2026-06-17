@@ -80,11 +80,20 @@
    page-598b852560e1b5a1.js:1:6605    .There are some points to be noted:
    ```
 
-- [] Fix these issue 
+- [x] Fix these issue 
 
-- When clicked on url like `http://localhost:3000/room?roomid=yiuj9o` prompt him/her to only enter the unique name and join the chat room with the room-id `yiuj9o`
+	- When clicked on url like `http://localhost:3000/room?roomid=yiuj9o` prompt him/her to only enter the unique name and join the chat room with the room-id `yiuj9o`
 
-- When a user is trying to join an existing room using `Room ID`  or like the above link then first check if the room id already exists or if already created or not expired or if there is no user in the room, etc - if any of these issue exist then show this a proper error message, else take the unique name and allow him to join.
+	- When a user is trying to join an existing room using `Room ID`  or like the above link then first check if the room id already exists or if already created or not expired or if there is no user in the room, etc - if any of these issue exist then show this a proper error message, else take the unique name and allow him to join.
+
+- [x] The existing room - `General Chat`, `Random`, `Tech Talk`, `Gaming` and `Music Lover` should never expire. This only apply to these 5 rooms only.
+
+- [] Refer the attached image. In mobile view. Fix there following UI issue inside a room: 
+	- In the header i want the count of no. of user joined. 
+	- Decrease the size of the message `Share the room ID to invite others`
+	- When clicked on the `user icon` i want a list of all the joined users 
+
+- [] Enhance the loader and use skeletal loader when clicked on `Create New Room` or `Join` or when loading the room from room id and URL etc.
 
 - []
 - []

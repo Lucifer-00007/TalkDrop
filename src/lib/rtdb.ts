@@ -84,7 +84,8 @@ export const setTyping = async (roomId: string, userId: string, isTyping: boolea
   }
 }
 
-export const checkRoomHasOnlineUsers = async (roomId: string): Promise<boolean> => {
+export const checkRoomHasOnlineUsers = async (roomId: string, skipCheck: boolean = false): Promise<boolean> => {
+  if (skipCheck) return true
   const rtdbInstance = rtdb()
   if (!rtdbInstance) return false
 

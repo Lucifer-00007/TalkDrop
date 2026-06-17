@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { useAuth } from '@/hooks/useAuth'
-import { validateRoomForJoin } from '@/lib/firestore'
+import { validateRoomForJoin, isPermanentRoom } from '@/lib/firestore'
 import { checkRoomHasOnlineUsers } from '@/lib/rtdb'
 import { MessageCircle, AlertCircle, Loader2 } from 'lucide-react'
 
@@ -51,7 +51,7 @@ export default function RoomPageClient({ roomId }: RoomPageClientProps) {
           return
         }
 
-        const hasUsers = await checkRoomHasOnlineUsers(roomId)
+        const hasUsers = await checkRoomHasOnlineUsers(roomId, isPermanentRoom(roomId))
         if (!hasUsers) {
           setViewState('error')
           setErrorMessage('This room has no active participants. The room may have been abandoned or the creator has left.')

@@ -8,8 +8,13 @@ import {
   Timestamp,
 } from 'firebase/firestore'
 import { firestore } from './firebase'
+import { DUMMY_ROOMS } from '@/constants'
 
 export const ROOM_EXPIRY_HOURS = 24
+
+const PERMANENT_ROOM_IDS = new Set(DUMMY_ROOMS.map((r) => r.id))
+
+export const isPermanentRoom = (roomId: string) => PERMANENT_ROOM_IDS.has(roomId)
 
 export type RoomValidationResult =
   | { valid: true }
@@ -25,14 +30,14 @@ export const validateRoomForJoin = async (roomId: string): Promise<RoomValidatio
     const roomRef = doc(firestoreInstance, 'rooms', roomId)
     const roomSnap = await getDoc(roomRef)
 
-    if (!roomSnap.exists()) {
+    if (!roomSnap.exists() && !PERMANENT_ROOM_IDS.has(roomId)) {
       return { valid: false, error: 'Room not found. This room does not exist or has been deleted.' }
     }
 
     const data = roomSnap.data() as RoomMetadata
     const now = new Date()
 
-    if (data.createdAt) {
+    if (data.createdAt && !PERMANENT_ROOM_IDS.has(roomId)) {
       const createdAt = data.createdAt.toDate()
       const expiresAt = new Date(createdAt.getTime() + ROOM_EXPIRY_HOURS * 60 * 60 * 1000)
       if (now > expiresAt) {

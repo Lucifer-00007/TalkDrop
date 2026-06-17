@@ -11,7 +11,7 @@ import Header from '@/components/Header'
 import { useAuth } from '@/hooks/useAuth'
 import { DUMMY_ROOMS, APP_NAME, APP_TAGLINE, HOW_IT_WORKS, USE_CASES, MESSAGE_RETENTION, COPYRIGHT_YEAR } from '@/constants'
 import { getRoomPath } from '@/lib/room-url'
-import { validateRoomForJoin, createRoomMetadata } from '@/lib/firestore'
+import { validateRoomForJoin, createRoomMetadata, isPermanentRoom } from '@/lib/firestore'
 import { checkRoomHasOnlineUsers } from '@/lib/rtdb'
 
 export default function HomePage() {
@@ -55,7 +55,7 @@ export default function HomePage() {
           return
         }
 
-        const hasUsers = await checkRoomHasOnlineUsers(targetRoom)
+        const hasUsers = await checkRoomHasOnlineUsers(targetRoom, isPermanentRoom(targetRoom))
         if (!hasUsers) {
           setJoinError('This room has no active participants. The room may have been abandoned.')
           return
