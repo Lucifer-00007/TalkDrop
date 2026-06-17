@@ -93,9 +93,31 @@
 	- Decrease the size of the message `Share the room ID to invite others`
 	- When clicked on the `user icon` i want a list of all the joined users 
 
-- [] Enhance the loader and use skeletal loader when clicked on `Create New Room` or `Join` or when loading the room from room id and URL etc.
+- [x] Enhance the loader and use skeletal loader when clicked on `Create New Room` or `Join` or when loading the room from room id and URL etc.
 
-- []
+- [] Create a script inside the ./scripts/ directory that checks all files under ./src and reports any file that exceeds 500 lines.
+
+	Requirements:
+		- Ignore the ./src/components/ui/ directory completely.
+		- Scan only source files inside ./src.
+		- If one or more files exceed 500 lines, output a list of those files with their line counts.
+		- At the end of the report, include a short recommendation suggesting that large files should be split into smaller modules.
+
+	Refactoring guidance for the recommendation:
+		- For example, if a file is named userListing, suggest creating a folder named userListing.
+		- Move the related modular pieces into that folder.
+		- Add an index file for clean exports.
+		- Delete the original userListing file after the refactor.
+		- Update all imports that referenced the old file so they point to the new module structure.
+
+	Additional expectations:
+		- Write clean, maintainable code.
+		- Follow best practices.
+		- Include comments where helpful.
+		- Make the script easy to run and understand.
+		- Ensure the output is clear and actionable.
+
+
 - []
 - []
 
