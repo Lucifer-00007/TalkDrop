@@ -1,4 +1,11 @@
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { loadEnvConfig } from '@next/env'
 import admin from 'firebase-admin'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+loadEnvConfig(path.resolve(__dirname, '..'))
 
 const [, , action, ...targets] = process.argv
 
@@ -21,9 +28,11 @@ const getRequiredEnv = (name) => {
   return value
 }
 
-const projectId = getRequiredEnv('FIREBASE_ADMIN_PROJECT_ID')
-const clientEmail = getRequiredEnv('FIREBASE_ADMIN_CLIENT_EMAIL')
-const privateKey = getRequiredEnv('FIREBASE_ADMIN_PRIVATE_KEY').replace(/\\n/g, '\n')
+const projectId = getRequiredEnv('FIREBASE_PROJECT_ID')
+const clientEmail = getRequiredEnv('FIREBASE_CLIENT_EMAIL')
+const privateKey = getRequiredEnv('FIREBASE_PRIVATE_KEY').replace(/\\n/g, '\n')
+const databaseURL = process.env.FIREBASE_DATABASE_URL
+const storageBucket = process.env.FIREBASE_STORAGE_BUCKET
 
 if (!admin.apps.length) {
   admin.initializeApp({
@@ -32,6 +41,8 @@ if (!admin.apps.length) {
       clientEmail,
       privateKey,
     }),
+    ...(databaseURL ? { databaseURL } : {}),
+    ...(storageBucket ? { storageBucket } : {}),
   })
 }
 
