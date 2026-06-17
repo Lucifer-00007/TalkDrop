@@ -1,4 +1,12 @@
-import { doc, setDoc, addDoc, collection, serverTimestamp, Timestamp } from 'firebase/firestore'
+import {
+  addDoc,
+  collection,
+  doc,
+  getDoc,
+  serverTimestamp,
+  setDoc,
+  Timestamp,
+} from 'firebase/firestore'
 import { firestore } from './firebase'
 
 export interface FirestoreMessage {
@@ -19,10 +27,16 @@ export const createRoomMetadata = async (roomId: string, metadata: Omit<RoomMeta
   const firestoreInstance = firestore()
   if (!firestoreInstance) throw new Error('Firebase Firestore not initialized')
   const roomRef = doc(firestoreInstance, 'rooms', roomId)
+  const existingRoom = await getDoc(roomRef)
+
+  if (existingRoom.exists()) {
+    return
+  }
+
   await setDoc(roomRef, {
     ...metadata,
-    createdAt: serverTimestamp()
-  }, { merge: true })
+    createdAt: serverTimestamp(),
+  })
 }
 
 export const saveMessageToFirestore = async (roomId: string, message: Omit<FirestoreMessage, 'createdAt' | 'expiresAt'>) => {
@@ -31,10 +45,10 @@ export const saveMessageToFirestore = async (roomId: string, message: Omit<Fires
   const messagesRef = collection(firestoreInstance, 'rooms', roomId, 'messages')
   const expirationTime = new Date()
   expirationTime.setHours(expirationTime.getHours() + 24) // 24 hour retention
-  
+
   await addDoc(messagesRef, {
     ...message,
     createdAt: serverTimestamp(),
-    expiresAt: expirationTime
+    expiresAt: expirationTime,
   })
 }

@@ -96,11 +96,6 @@ export const APP_METADATA = {
   description: 'Create and join instant chat rooms with real-time messaging',
 }
 
-export const ALLOWED_ADMIN_EMAILS = [
-  'files.backup.777@gmail.com',
-  'admin.files.backup.777@gmail.com'
-]
-
 export const DYNAMIC_PARAMS = false
 
 export const DEFAULT_SETTINGS = {

@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { getAllMessages, deleteMessage, deleteRoomMessages, type AdminMessage } from '@/lib/admin'
+import { getAdminActionErrorMessage, getAdminReadErrorMessage } from '@/lib/admin-errors'
 import ConfirmDialog from '@/components/ConfirmDialog'
 
 export default function MessagesPage() {
@@ -20,14 +21,19 @@ export default function MessagesPage() {
   const [selectedMessage, setSelectedMessage] = useState<AdminMessage | null>(null)
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const loadMessages = useCallback(async () => {
     setLoading(true)
+    setError(null)
+
     try {
       const data = await getAllMessages()
       setMessages(data)
     } catch (error) {
       console.error('Failed to load messages:', error)
+      setMessages([])
+      setError(getAdminReadErrorMessage(error))
     } finally {
       setLoading(false)
     }
@@ -62,8 +68,10 @@ export default function MessagesPage() {
 
   const handleDeleteMessage = async () => {
     if (!selectedMessage) return
-    
+
     setDeleting(true)
+    setError(null)
+
     try {
       await deleteMessage(selectedMessage.roomId, selectedMessage.id)
       setMessages(prev => prev.filter(m => m.id !== selectedMessage.id))
@@ -71,6 +79,7 @@ export default function MessagesPage() {
       setSelectedMessage(null)
     } catch (error) {
       console.error('Failed to delete message:', error)
+      setError(getAdminActionErrorMessage(error))
     } finally {
       setDeleting(false)
     }
@@ -80,6 +89,8 @@ export default function MessagesPage() {
     if (!selectedRoomId) return
 
     setDeleting(true)
+    setError(null)
+
     try {
       await deleteRoomMessages(selectedRoomId)
       setMessages(prev => prev.filter(m => m.roomId !== selectedRoomId))
@@ -87,6 +98,7 @@ export default function MessagesPage() {
       setSelectedRoomId(null)
     } catch (error) {
       console.error('Failed to delete room messages:', error)
+      setError(getAdminActionErrorMessage(error))
     } finally {
       setDeleting(false)
     }
@@ -101,6 +113,12 @@ export default function MessagesPage() {
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           </Button>
         </div>
+
+        {error && (
+          <Card className="border-amber-500/40 bg-amber-500/5 p-4 text-sm text-muted-foreground">
+            {error}
+          </Card>
+        )}
 
         <Card className="p-4 mb-6">
           <div className="flex gap-4">

@@ -91,6 +91,14 @@ npm run deploy
 3. **Start chatting** - messages appear in real-time
 4. **Share the room ID** with others to invite them
 
+## Admin Security
+
+- `/admin` is compatible with static Firebase Hosting because it relies on client-side UX guards only.
+- Firebase Authentication identifies the user, but Firebase custom claims such as `isAdmin: true` determine admin access.
+- Firestore and Realtime Database rules are the real enforcement layer for admin reads and destructive actions.
+- Grant or revoke admin access with `npm run admin:claims -- grant <email-or-uid>` and `npm run admin:claims -- revoke <email-or-uid>`.
+- Keep Admin SDK credentials in server-only `FIREBASE_*` environment variables, never in `NEXT_PUBLIC_*`.
+
 ## 📁 Project Structure
 
 ```

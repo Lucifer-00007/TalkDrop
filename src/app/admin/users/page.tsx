@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Loader2, Search, Users as UsersIcon, UserCheck, UserX } from 'lucide-react'
 import { rtdb } from '@/lib/firebase'
 import { ref, onValue } from 'firebase/database'
+import { getAdminReadErrorMessage } from '@/lib/admin-errors'
 
 interface User {
   uid: string
@@ -20,39 +21,54 @@ export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const db = rtdb()
-    if (!db) return
+    if (!db) {
+      setLoading(false)
+      setError('Realtime Database is not available in this session.')
+      return
+    }
 
     const roomsRef = ref(db, 'rooms')
-    
-    const unsubscribe = onValue(roomsRef, (snapshot) => {
-      const data = snapshot.val()
-      const usersMap = new Map<string, User>()
-      
-      if (data) {
-        Object.values(data as Record<string, unknown>).forEach((room) => {
-          const roomData = room as Record<string, unknown>
-          if (roomData.presence) {
-            Object.entries(roomData.presence as Record<string, Record<string, unknown>>).forEach(([uid, userData]) => {
-              const existing = usersMap.get(uid)
-              if (!existing || (userData.lastSeen && Number(userData.lastSeen) > existing.lastSeen)) {
-                usersMap.set(uid, {
-                  uid,
-                  displayName: String(userData.displayName || 'Anonymous'),
-                  lastSeen: Number(userData.lastSeen) || Date.now(),
-                  status: userData.online ? 'online' : 'offline',
-                })
-              }
-            })
-          }
-        })
-      }
-      
-      setUsers(Array.from(usersMap.values()))
-      setLoading(false)
-    })
+    setError(null)
+
+    const unsubscribe = onValue(
+      roomsRef,
+      (snapshot) => {
+        const data = snapshot.val()
+        const usersMap = new Map<string, User>()
+
+        if (data) {
+          Object.values(data as Record<string, unknown>).forEach((room) => {
+            const roomData = room as Record<string, unknown>
+            if (roomData.presence) {
+              Object.entries(roomData.presence as Record<string, Record<string, unknown>>).forEach(([uid, userData]) => {
+                const existing = usersMap.get(uid)
+                if (!existing || (userData.lastSeen && Number(userData.lastSeen) > existing.lastSeen)) {
+                  usersMap.set(uid, {
+                    uid,
+                    displayName: String(userData.displayName || 'Anonymous'),
+                    lastSeen: Number(userData.lastSeen) || Date.now(),
+                    status: userData.online ? 'online' : 'offline',
+                  })
+                }
+              })
+            }
+          })
+        }
+
+        setUsers(Array.from(usersMap.values()))
+        setLoading(false)
+      },
+      (error) => {
+        console.error('Failed to load admin users:', error)
+        setUsers([])
+        setError(getAdminReadErrorMessage(error))
+        setLoading(false)
+      },
+    )
 
     return () => {
       unsubscribe()
@@ -82,6 +98,12 @@ export default function UsersPage() {
           <h1 className="text-3xl font-bold">Users</h1>
           <p className="text-muted-foreground mt-1">Manage and monitor all users</p>
         </div>
+
+        {error && (
+          <Card className="border-amber-500/40 bg-amber-500/5">
+            <CardContent className="p-6 text-sm text-muted-foreground">{error}</CardContent>
+          </Card>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {loading ? (

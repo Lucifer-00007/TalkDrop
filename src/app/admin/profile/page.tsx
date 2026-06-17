@@ -1,6 +1,6 @@
 'use client'
 
-import { useAuth } from '@/hooks/useAuth'
+import { useAdminAccess } from '@/hooks/useAdminAccess'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
@@ -12,7 +12,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 export default function ProfilePage() {
-  const { user, loading } = useAuth()
+  const { user, adminRole, loading } = useAdminAccess()
   const router = useRouter()
   const [displayName, setDisplayName] = useState('')
   const [copied, setCopied] = useState(false)
@@ -68,10 +68,10 @@ export default function ProfilePage() {
                       <h2 className="text-2xl font-bold">{user?.email || 'Admin'}</h2>
                       <Badge variant="default" className="gap-1">
                         <Shield className="h-3 w-3" />
-                        Admin
+                        {adminRole || 'admin'}
                       </Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground">Administrator Account</p>
+                    <p className="text-sm text-muted-foreground">Firebase custom claim: `isAdmin: true`</p>
                   </div>
                 </div>
                 <Button variant="outline" size="sm" className="gap-2">

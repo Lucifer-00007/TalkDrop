@@ -1,6 +1,6 @@
 'use client'
 
-import { Loader2, ShieldAlert, LogOut } from 'lucide-react'
+import { Loader2, ShieldAlert, LogOut, UserX } from 'lucide-react'
 import { Button } from './ui/button'
 import AdminAuth from './AdminAuth'
 import AdminLayout from './AdminLayout'
@@ -30,6 +30,39 @@ export default function AdminRouteGuard({ children }: { children: React.ReactNod
   }
 
   if (!user || isAnonymous) {
+    if (isAnonymous && user) {
+      return (
+        <div className="min-h-screen flex items-center justify-center p-6 bg-background">
+          <div className="w-full max-w-lg rounded-xl border bg-card p-6 shadow-sm">
+            <div className="flex items-start gap-3">
+              <UserX className="h-6 w-6 text-amber-600 mt-0.5" />
+              <div className="space-y-3">
+                <div>
+                  <h1 className="text-xl font-semibold">Guest sessions cannot access admin</h1>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    You are currently signed in anonymously. Sign out of the guest session, then sign in with an account that has the Firebase admin claim.
+                  </p>
+                </div>
+                <div className="rounded-md border bg-muted/40 p-3">
+                  <p className="text-xs text-muted-foreground">Current guest user ID</p>
+                  <p className="text-sm font-mono break-all">{user.uid}</p>
+                </div>
+                <div className="flex gap-3">
+                  <Button onClick={handleSignOut} className="gap-2">
+                    <LogOut className="h-4 w-4" />
+                    Sign Out
+                  </Button>
+                  <Button variant="outline" onClick={() => router.push('/')}>
+                    Go Home
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
     return <AdminAuth />
   }
 

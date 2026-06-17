@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge'
 import { Save, Database, Shield, Clock, Bell, RefreshCw } from 'lucide-react'
 import { collection, getDocs } from 'firebase/firestore'
 import { firestore } from '@/lib/firebase'
+import { getAdminReadErrorMessage } from '@/lib/admin-errors'
 import { DEFAULT_SETTINGS } from '@/constants'
 
 export default function SettingsPage() {
@@ -17,23 +18,28 @@ export default function SettingsPage() {
   const [rooms, setRooms] = useState<Array<{ id: string; retention: string }>>([])
   const [saved, setSaved] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const loadRooms = async () => {
     setLoading(true)
+    setError(null)
+
     try {
       const firestoreInstance = firestore()
       if (!firestoreInstance) {
-        setLoading(false)
+        setError('Firestore is not available in this session.')
         return
       }
-      
+
       const snapshot = await getDocs(collection(firestoreInstance, 'rooms'))
-      setRooms(snapshot.docs.map(doc => ({ id: doc.id, retention: '24' })))
+      setRooms(snapshot.docs.map((doc) => ({ id: doc.id, retention: '24' })))
     } catch (error) {
       console.error('Failed to load rooms:', error)
       setRooms([])
+      setError(getAdminReadErrorMessage(error))
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
 
@@ -48,8 +54,14 @@ export default function SettingsPage() {
     <div className="p-6 space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Settings</h1>
-        <p className="text-muted-foreground mt-1">Configure your TalkDrop instance</p>
+        <p className="text-muted-foreground mt-1">Review admin-side configuration placeholders and room metadata protected by Firebase rules</p>
       </div>
+
+      {error && (
+        <Card className="border-amber-500/40 bg-amber-500/5">
+          <CardContent className="p-6 text-sm text-muted-foreground">{error}</CardContent>
+        </Card>
+      )}
 
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
@@ -202,6 +214,9 @@ export default function SettingsPage() {
           Save Changes
         </Button>
         {saved && <Badge variant="default">Settings saved!</Badge>}
+        <p className="text-xs text-muted-foreground">
+          This page is UI-only for now and does not bypass Firebase-enforced authorization.
+        </p>
       </div>
     </div>
   )
