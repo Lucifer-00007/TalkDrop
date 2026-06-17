@@ -13,6 +13,13 @@
       "**/.*",
       "**/node_modules/**"
     ],
+    "redirects": [
+      {
+        "source": "/room/:id",
+        "destination": "/room?roomid=:id",
+        "type": 301
+      }
+    ],
     "cleanUrls": true,
     "trailingSlash": false
   },

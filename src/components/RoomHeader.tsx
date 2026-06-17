@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Copy, Share2, ArrowLeft, Users, Moon, Sun, LogOut } from 'lucide-react'
+import { getRoomUrl } from '@/lib/room-url'
 
 interface RoomHeaderProps {
   roomId: string
@@ -34,7 +35,7 @@ export default function RoomHeader({ roomId }: RoomHeaderProps) {
   }
 
   const copyRoomLink = async () => {
-    const url = `${window.location.origin}/room/${roomId}`
+    const url = getRoomUrl(window.location.origin, roomId)
     try {
       await navigator.clipboard.writeText(url)
       setCopied(true)
@@ -53,7 +54,7 @@ export default function RoomHeader({ roomId }: RoomHeaderProps) {
   }
 
   const shareRoom = async () => {
-    const url = `${window.location.origin}/room/${roomId}`
+    const url = getRoomUrl(window.location.origin, roomId)
     
     if (navigator.share) {
       try {

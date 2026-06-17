@@ -8,7 +8,6 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { getAllMessages, deleteMessage, deleteRoomMessages, type AdminMessage } from '@/lib/admin'
-import AdminLayout from '@/components/AdminLayout'
 import ConfirmDialog from '@/components/ConfirmDialog'
 
 export default function MessagesPage() {
@@ -79,7 +78,7 @@ export default function MessagesPage() {
 
   const handleDeleteRoom = async () => {
     if (!selectedRoomId) return
-    
+
     setDeleting(true)
     try {
       await deleteRoomMessages(selectedRoomId)
@@ -94,9 +93,8 @@ export default function MessagesPage() {
   }
 
   return (
-    <AdminLayout>
-      <div className="p-6 flex flex-col items-center">
-        <div className="w-full max-w-6xl space-y-6">
+    <div className="p-6 flex flex-col items-center">
+      <div className="w-full max-w-6xl space-y-6">
         <div className="flex items-center gap-2 mb-6">
           <h1 className="text-2xl font-bold">Messages</h1>
           <Button onClick={loadMessages} disabled={loading} size="sm" variant="outline">
@@ -194,27 +192,26 @@ export default function MessagesPage() {
             </TableBody>
           </Table>
         </Card>
-        </div>
-
-        <ConfirmDialog
-          open={deleteDialogOpen}
-          onOpenChange={setDeleteDialogOpen}
-          title="Delete Message"
-          description="Are you sure you want to delete this message? This action cannot be undone."
-          onConfirm={handleDeleteMessage}
-          loading={deleting}
-        />
-
-        <ConfirmDialog
-          open={clearRoomDialogOpen}
-          onOpenChange={setClearRoomDialogOpen}
-          title="Clear Room Messages"
-          description={`Are you sure you want to delete all messages in room ${selectedRoomId}? This action cannot be undone.`}
-          onConfirm={handleDeleteRoom}
-          confirmText="Delete All"
-          loading={deleting}
-        />
       </div>
-    </AdminLayout>
+
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Delete Message"
+        description="Are you sure you want to delete this message? This action cannot be undone."
+        onConfirm={handleDeleteMessage}
+        loading={deleting}
+      />
+
+      <ConfirmDialog
+        open={clearRoomDialogOpen}
+        onOpenChange={setClearRoomDialogOpen}
+        title="Clear Room Messages"
+        description={`Are you sure you want to delete all messages in room ${selectedRoomId}? This action cannot be undone.`}
+        onConfirm={handleDeleteRoom}
+        confirmText="Delete All"
+        loading={deleting}
+      />
+    </div>
   )
 }

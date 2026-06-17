@@ -41,7 +41,27 @@
 	✔  Firebase initialization complete!
 	```
 
-- []
+- [] Harden `/admin` properly next by implementing real admin authorization end to end.
+
+**What Is Missing / Weak**
+- `/admin` authorization is not enforced server-side at the route level. The route check is only in the client layout, so it is UI protection, not strong route protection: [AdminLayout](file:///Users/ani/Developer/ANI/ProjectsOrgs/1VibeCodeAI/AntiGravity/TalkDrop/src/components/AdminLayout.tsx#L10-L34).
+- The shared auth hook treats any signed-in Firebase user as authenticated, including anonymous users from the public chat flow: [useAuth.ts](file:///Users/ani/Developer/ANI/ProjectsOrgs/1VibeCodeAI/AntiGravity/TalkDrop/src/hooks/useAuth.ts#L41-L59).
+- That means a user who already signed in anonymously can satisfy `user != null`, and `AdminLayout` will show admin pages without forcing the admin login form.
+- Admin data reads are done directly from the client with Firebase SDKs in [admin-stats.ts](file:///Users/ani/Developer/ANI/ProjectsOrgs/1VibeCodeAI/AntiGravity/TalkDrop/src/lib/admin-stats.ts#L13-L70), [admin.ts](file:///Users/ani/Developer/ANI/ProjectsOrgs/1VibeCodeAI/AntiGravity/TalkDrop/src/lib/admin.ts#L11-L37), and [users/page.tsx](file:///Users/ani/Developer/ANI/ProjectsOrgs/1VibeCodeAI/AntiGravity/TalkDrop/src/app/admin/users/page.tsx#L25-L61).
+- Firestore rules currently allow any authenticated user to read/list rooms and read/write messages in [firestore.rules](file:///Users/ani/Developer/ANI/ProjectsOrgs/1VibeCodeAI/AntiGravity/TalkDrop/firestore.rules#L10-L17), and RTDB rules allow any authenticated user to read/write in [database.rules.json](file:///Users/ani/Developer/ANI/ProjectsOrgs/1VibeCodeAI/AntiGravity/TalkDrop/database.rules.json#L2-L9).
+
+**Bottom Line**
+- `Authentication exists`: admin login UI plus allowed-email validation.
+- `Authorization exists only partially`: some delete actions are protected by Firestore rules.
+- `Full admin protection does not exist`: admin pages and most admin reads are effectively accessible to any authenticated Firebase user, including anonymous users.
+
+**Best-Practice Recommendation**
+- Add real admin authorization using Firebase custom claims or a server-verified admin session.
+- Enforce admin access in route protection, not just client UI.
+- Tighten Firestore and RTDB rules so admin reads/writes require `isAdmin`, not just `auth != null`.
+
+
+
 - []
 - []
 - []

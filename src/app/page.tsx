@@ -10,6 +10,7 @@ import { MessageCircle, Users, Zap } from 'lucide-react'
 import Header from '@/components/Header'
 import { useAuth } from '@/hooks/useAuth'
 import { DUMMY_ROOMS, APP_NAME, APP_TAGLINE, HOW_IT_WORKS, USE_CASES, MESSAGE_RETENTION, COPYRIGHT_YEAR } from '@/constants'
+import { getRoomPath } from '@/lib/room-url'
 
 export default function HomePage() {
   const [roomId, setRoomId] = useState('')
@@ -27,7 +28,7 @@ export default function HomePage() {
       setLoading(true)
       try {
         await signIn(displayName.trim())
-        router.push(`/room/${newRoomId}`)
+        router.push(getRoomPath(newRoomId))
       } catch (error) {
         console.error('Failed to create room:', error)
       } finally {
@@ -42,7 +43,7 @@ export default function HomePage() {
       setLoading(true)
       try {
         await signIn(displayName.trim())
-        router.push(`/room/${targetRoom}`)
+        router.push(getRoomPath(targetRoom))
       } catch (error) {
         console.error('Failed to join room:', error)
       } finally {

@@ -1,9 +1,28 @@
 {
   "rules": {
     "rooms": {
+      ".read": "auth != null && auth.token.isAdmin === true",
       "$roomId": {
-        ".read": "auth != null",
-        ".write": "auth != null"
+        ".read": false,
+        ".write": false,
+        "messages": {
+          ".read": "auth != null",
+          "$messageId": {
+            ".write": "auth != null"
+          }
+        },
+        "presence": {
+          ".read": "auth != null",
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid"
+          }
+        },
+        "typing": {
+          ".read": "auth != null",
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid"
+          }
+        }
       }
     }
   }

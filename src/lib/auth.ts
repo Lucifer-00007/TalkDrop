@@ -1,11 +1,22 @@
 import { signInAnonymously, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, User } from 'firebase/auth'
 import { auth } from './firebase'
-import { ALLOWED_ADMIN_EMAILS } from '@/constants'
+import { hasAdminAccess } from './admin-access'
 
-const validateAdminEmail = (email: string | null) => {
-  if (!email || !ALLOWED_ADMIN_EMAILS.includes(email)) {
-    throw new Error('Unauthorized: This email is not allowed to access the admin panel')
+const ensureAdminUser = async (user: User) => {
+  if (user.isAnonymous) {
+    const authInstance = auth()
+    await authInstance?.signOut()
+    throw new Error('Unauthorized: Anonymous users cannot access the admin panel')
   }
+
+  const allowed = await hasAdminAccess(user, true)
+  if (!allowed) {
+    const authInstance = auth()
+    await authInstance?.signOut()
+    throw new Error('Unauthorized: This account is missing the required admin claim')
+  }
+
+  return user
 }
 
 export const getAuthErrorMessage = (error: unknown): string => {
@@ -31,17 +42,15 @@ export const signInAnonymous = async (): Promise<User> => {
 export const signInWithEmail = async (email: string, password: string): Promise<User> => {
   const authInstance = auth()
   if (!authInstance) throw new Error('Firebase auth not initialized')
-  validateAdminEmail(email)
   const result = await signInWithEmailAndPassword(authInstance, email, password)
-  return result.user
+  return ensureAdminUser(result.user)
 }
 
 export const signUpWithEmail = async (email: string, password: string): Promise<User> => {
   const authInstance = auth()
   if (!authInstance) throw new Error('Firebase auth not initialized')
-  validateAdminEmail(email)
   const result = await createUserWithEmailAndPassword(authInstance, email, password)
-  return result.user
+  return ensureAdminUser(result.user)
 }
 
 export const signInWithGoogle = async (): Promise<User> => {
@@ -50,14 +59,13 @@ export const signInWithGoogle = async (): Promise<User> => {
   const provider = new GoogleAuthProvider()
   console.log('[Auth] Starting Google sign-in...')
   const result = await signInWithPopup(authInstance, provider)
-  console.log('[Auth] Google sign-in successful, email:', result.user.email)
+  console.log('[Auth] Google sign-in successful, uid:', result.user.uid)
   try {
-    validateAdminEmail(result.user.email)
-    console.log('[Auth] Email validated successfully')
-    return result.user
+    const user = await ensureAdminUser(result.user)
+    console.log('[Auth] Admin access validated successfully')
+    return user
   } catch (error) {
-    console.error('[Auth] Email validation failed:', error)
-    await authInstance.signOut()
+    console.error('[Auth] Admin access validation failed:', error)
     throw error
   }
 }

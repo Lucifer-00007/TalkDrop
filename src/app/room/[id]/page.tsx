@@ -7,6 +7,14 @@ export async function generateStaticParams() {
   return DUMMY_ROOMS.map(room => ({ id: room.id }))
 }
 
-export default function RoomPage() {
-  return <RoomPageClient />
+type LegacyRoomPageProps = {
+  params: Promise<{
+    id: string
+  }>
+}
+
+export default async function LegacyRoomPage({ params }: LegacyRoomPageProps) {
+  const { id } = await params
+
+  return <RoomPageClient roomId={id} />
 }
