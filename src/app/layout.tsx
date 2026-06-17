@@ -8,13 +8,27 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = APP_METADATA
 
+const themeInitScript = `
+(function() {
+  try {
+    var theme = localStorage.getItem('theme');
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    }
+  } catch (e) {}
+})();
+`
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body className={inter.className}>
         <FirebaseConfigCheck>
           {children}
