@@ -26,6 +26,8 @@
 
 ### 3. Grant the Admin Claim
 
+> **Note:** This command securely assigns administrator privileges by attaching hidden metadata (Custom Claims) to the user's Auth record via the Firebase Admin SDK. This guarantees true backend security: Firestore and Realtime Database rules verify this `isAdmin` claim on the server side, effectively blocking unauthorized access even if the client-side frontend is manipulated.
+
 From the project root, run:
 
 ```bash
