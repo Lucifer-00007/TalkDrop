@@ -40,13 +40,13 @@ export default function ChatWindow({ roomId }: { roomId: string }) {
       
       <div className="flex-1 flex overflow-hidden">
         {/* Presence sidebar - hidden on mobile */}
-        <div className="hidden lg:block w-64">
+        <div className="hidden lg:block w-64 shrink-0">
           <PresenceList users={users} />
         </div>
 
         {/* Main chat area */}
-        <div className="flex-1 flex flex-col relative">
-          <div className="flex-1 overflow-hidden pb-28 bg-white dark:bg-gray-800">
+        <div className="flex-1 flex flex-col relative min-w-0">
+          <div className="flex-1 overflow-hidden pb-20 bg-white dark:bg-gray-800">
             <MessageList 
               messages={messages} 
               currentUserId={currentUser.id}

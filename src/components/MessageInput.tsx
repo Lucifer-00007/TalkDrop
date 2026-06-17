@@ -73,8 +73,8 @@ export default function MessageInput({ onSendMessage, onTyping }: MessageInputPr
   }, [])
 
   return (
-    <div className="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-      <div className="flex items-end space-x-2">
+    <div className="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3">
+      <div className="flex items-end gap-2">
         <div className="flex-1 relative">
           <textarea
             ref={textareaRef}
@@ -99,9 +99,9 @@ export default function MessageInput({ onSendMessage, onTyping }: MessageInputPr
         </Button>
       </div>
 
-      <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+      <p className="mt-1.5 text-xs text-gray-400 dark:text-gray-500 text-center">
         Press Enter to send, Shift+Enter for new line
-      </div>
+      </p>
     </div>
   )
 }

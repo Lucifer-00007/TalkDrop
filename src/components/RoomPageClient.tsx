@@ -105,19 +105,28 @@ export default function RoomPageClient({ roomId }: RoomPageClientProps) {
 
   if (viewState === 'error') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
         <div className="w-full max-w-md">
-          <Card>
-            <CardHeader className="text-center">
-              <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-2" />
+          <Card className="shadow-xl border-red-100 dark:border-gray-700">
+            <CardHeader className="text-center pb-4">
+              <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-red-100 dark:bg-red-900/30 mx-auto mb-3">
+                <AlertCircle className="h-8 w-8 text-red-600 dark:text-red-400" />
+              </div>
               <CardTitle className="text-xl">Unable to Join Room</CardTitle>
               <CardDescription className="mt-2 text-sm text-gray-600 dark:text-gray-300">
                 {errorMessage}
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-2">
               <Button className="w-full" onClick={() => router.push('/')}>
                 Go Home
+              </Button>
+              <Button
+                variant="ghost"
+                className="w-full"
+                onClick={() => window.location.reload()}
+              >
+                Try Again
               </Button>
             </CardContent>
           </Card>
@@ -130,17 +139,20 @@ export default function RoomPageClient({ roomId }: RoomPageClientProps) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
         <div className="w-full max-w-md">
-          <Card>
-            <CardHeader className="text-center">
-              <MessageCircle className="h-12 w-12 text-blue-600 dark:text-blue-400 mx-auto mb-2" />
+          <Card className="shadow-xl border-blue-100 dark:border-gray-700">
+            <CardHeader className="text-center pb-4">
+              <div className="flex items-center justify-center h-14 w-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg mx-auto mb-3">
+                <MessageCircle className="h-7 w-7 text-white" />
+              </div>
               <CardTitle className="text-xl">Join Chat Room</CardTitle>
               <CardDescription className="mt-2">
-                You&apos;re joining room: <span className="font-mono font-semibold text-blue-600 dark:text-blue-400">{roomId}</span>
+                You&apos;re joining room{' '}
+                <span className="font-mono font-semibold text-blue-600 dark:text-blue-400">{roomId}</span>
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <label htmlFor="displayName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label htmlFor="displayName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                   Display Name
                 </label>
                 <Input
@@ -149,14 +161,14 @@ export default function RoomPageClient({ roomId }: RoomPageClientProps) {
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className="w-full"
+                  className="w-full h-11"
                   autoFocus
                   maxLength={80}
                 />
               </div>
               <Button
                 onClick={handleJoin}
-                className="w-full"
+                className="w-full h-11"
                 disabled={!displayName.trim() || joining}
               >
                 {joining ? (
