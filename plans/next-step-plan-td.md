@@ -88,7 +88,7 @@
 
 - [x] The existing room - `General Chat`, `Random`, `Tech Talk`, `Gaming` and `Music Lover` should never expire. This only apply to these 5 rooms only.
 
-- [] Refer the attached image. In mobile view. Fix there following UI issue inside a room: 
+- [x] Refer the attached image. In mobile view. Fix there following UI issue inside a room: 
 	- In the header i want the count of no. of user joined. 
 	- Decrease the size of the message `Share the room ID to invite others`
 	- When clicked on the `user icon` i want a list of all the joined users 

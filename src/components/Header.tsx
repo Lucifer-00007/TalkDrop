@@ -20,7 +20,7 @@ export default function Header() {
   }
 
   return (
-    <header className="fixed top-0 left-0 right-0 px-4 py-3 flex justify-between items-center z-50 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border-b border-white/40 dark:border-white/10 shadow-sm">
+    <header className="fixed top-0 left-0 right-0 px-4 py-3 flex justify-between items-center z-50 bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl border-b border-white/30 dark:border-white/10 shadow-sm">
       <div className="flex items-center">
         <div className="flex items-center justify-center h-9 w-9 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 shadow-md">
           <MessageCircle className="h-5 w-5 text-white" />

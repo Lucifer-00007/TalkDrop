@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import ChatWindow from '@/components/ChatWindow'
+import ChatSkeleton from '@/components/ChatSkeleton'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -99,14 +100,7 @@ export default function RoomPageClient({ roomId }: RoomPageClientProps) {
   }
 
   if (viewState === 'loading') {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-4" />
-          <p className="text-gray-600 dark:text-gray-300">Validating room...</p>
-        </div>
-      </div>
-    )
+    return <ChatSkeleton />
   }
 
   if (viewState === 'error') {

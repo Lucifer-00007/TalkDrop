@@ -5,6 +5,7 @@ import RoomHeader from './RoomHeader'
 import MessageList from './MessageList'
 import MessageInput from './MessageInput'
 import PresenceList from './PresenceList'
+import ChatSkeleton from './ChatSkeleton'
 import { useAuth } from '@/hooks/useAuth'
 import { useRoom } from '@/hooks/useRoom'
 
@@ -30,14 +31,7 @@ export default function ChatWindow({ roomId }: { roomId: string }) {
   }, [isAuthenticated, signIn])
 
   if (loading || !isAuthenticated || !currentUser) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p>Loading...</p>
-        </div>
-      </div>
-    )
+    return <ChatSkeleton />
   }
 
   return (

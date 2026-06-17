@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { MessageCircle, Users, Zap } from 'lucide-react'
+import { MessageCircle, Users, Zap, Loader2 } from 'lucide-react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { useAuth } from '@/hooks/useAuth'
@@ -166,10 +166,10 @@ export default function HomePage() {
                   />
                 </div>
 
-                <div className="flex gap-2 p-1 bg-muted rounded-lg">
+                <div className="flex gap-1 p-1 bg-muted rounded-lg border border-gray-200 dark:border-gray-700">
                   <Button
-                    variant={mode === 'create' ? 'default' : 'ghost'}
-                    className={`flex-1 ${mode !== 'create' ? 'dark:border dark:border-white/20' : ''}`}
+                    variant="ghost"
+                    className={`flex-1 transition-all ${mode === 'create' ? 'bg-blue-50 dark:bg-blue-700 text-blue-700 dark:text-white ring-1 ring-blue-200 dark:ring-blue-300 font-medium shadow-sm dark:shadow-[0_0_12px_rgba(59,130,246,0.25)]' : 'text-gray-500 dark:text-gray-400'}`}
                     onClick={() => {
                       setMode('create')
                       setJoinError('')
@@ -178,8 +178,8 @@ export default function HomePage() {
                     Create New
                   </Button>
                   <Button
-                    variant={mode === 'join' ? 'default' : 'ghost'}
-                    className={`flex-1 ${mode !== 'join' ? 'dark:border dark:border-white/20' : ''}`}
+                    variant="ghost"
+                    className={`flex-1 transition-all ${mode === 'join' ? 'bg-blue-50 dark:bg-blue-700 text-blue-700 dark:text-white ring-1 ring-blue-200 dark:ring-blue-300 font-medium shadow-sm dark:shadow-[0_0_12px_rgba(59,130,246,0.25)]' : 'text-gray-500 dark:text-gray-400'}`}
                     onClick={() => {
                       setMode('join')
                       setJoinError('')
@@ -201,7 +201,14 @@ export default function HomePage() {
                       className="w-full"
                       disabled={!displayName.trim() || loading}
                     >
-                      {loading ? 'Creating...' : 'Create New Room'}
+                      {loading ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                          Creating...
+                        </>
+                      ) : (
+                        'Create New Room'
+                      )}
                     </Button>
                   </div>
                 ) : (
@@ -234,7 +241,14 @@ export default function HomePage() {
                         }}
                         disabled={!selectedRoom || !displayName.trim() || loading}
                       >
-                        {loading ? 'Joining...' : 'Join'}
+                        {loading ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                            Joining...
+                          </>
+                        ) : (
+                          'Join'
+                        )}
                       </Button>
                     </div>
 
@@ -252,7 +266,14 @@ export default function HomePage() {
                         onClick={joinRoom}
                         disabled={!roomId.trim() || !displayName.trim() || loading}
                       >
-                        {loading ? 'Joining...' : 'Join'}
+                        {loading ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                            Joining...
+                          </>
+                        ) : (
+                          'Join'
+                        )}
                       </Button>
                     </div>
                   </div>
@@ -313,9 +334,9 @@ export default function HomePage() {
           </div>
 
           {/* Footer */}
-          <Footer />
         </div>
       </div>
+      <Footer />
     </div>
   )
 }
