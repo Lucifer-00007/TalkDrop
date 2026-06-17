@@ -42,7 +42,7 @@ export default function ChatWindow({ roomId }: { roomId: string }) {
 
   return (
     <div className="h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
-      <RoomHeader roomId={roomId} />
+      <RoomHeader roomId={roomId} users={users} />
       
       <div className="flex-1 flex overflow-hidden">
         {/* Presence sidebar - hidden on mobile */}

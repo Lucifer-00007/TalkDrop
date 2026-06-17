@@ -8,8 +8,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { MessageCircle, Users, Zap } from 'lucide-react'
 import Header from '@/components/Header'
+import Footer from '@/components/Footer'
 import { useAuth } from '@/hooks/useAuth'
-import { DUMMY_ROOMS, APP_NAME, APP_TAGLINE, HOW_IT_WORKS, USE_CASES, MESSAGE_RETENTION, COPYRIGHT_YEAR } from '@/constants'
+import { DUMMY_ROOMS, APP_NAME, APP_TAGLINE, HOW_IT_WORKS, USE_CASES } from '@/constants'
 import { getRoomPath } from '@/lib/room-url'
 import { validateRoomForJoin, createRoomMetadata, isPermanentRoom } from '@/lib/firestore'
 import { checkRoomHasOnlineUsers } from '@/lib/rtdb'
@@ -80,20 +81,34 @@ export default function HomePage() {
         <div className="w-full max-w-4xl">
           {/* Hero */}
           <div className="text-center mb-16 mt-4">
-            <div className="flex items-center justify-center mb-4">
-              <MessageCircle className="h-12 w-12 text-blue-600 dark:text-blue-400 mr-3" />
-              <h1 className="text-4xl font-bold text-gray-900 dark:text-white">{APP_NAME}</h1>
+            <div className="inline-flex items-center gap-2 rounded-full bg-blue-100 dark:bg-blue-900/40 px-4 py-1.5 mb-6">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
+              </span>
+              <span className="text-sm font-medium text-blue-700 dark:text-blue-300">No sign-up required</span>
             </div>
-            <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
+            <div className="flex items-center justify-center mb-5">
+              <div className="flex items-center justify-center h-14 w-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg mr-4">
+                <MessageCircle className="h-7 w-7 text-white" />
+              </div>
+              <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">{APP_NAME}</h1>
+            </div>
+            <p className="text-xl text-gray-600 dark:text-gray-300 mb-2">
               {APP_TAGLINE}
+            </p>
+            <p className="text-sm text-gray-400 dark:text-gray-500">
+              Create a room, share the link, and start chatting instantly
             </p>
           </div>
 
           {/* Features */}
           <div className="grid md:grid-cols-3 gap-6 mb-16">
-              <Card>
+              <Card className="group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-blue-100 dark:border-gray-700">
                 <CardHeader className="text-center">
-                  <Zap className="h-8 w-8 text-blue-600 mx-auto mb-2" />
+                  <div className="flex items-center justify-center h-14 w-14 rounded-xl bg-blue-100 dark:bg-blue-900/40 mx-auto mb-3 group-hover:scale-110 transition-transform">
+                    <Zap className="h-7 w-7 text-blue-600 dark:text-blue-400" />
+                  </div>
                   <CardTitle className="text-lg">Instant Setup</CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -103,9 +118,11 @@ export default function HomePage() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-green-100 dark:border-gray-700">
                 <CardHeader className="text-center">
-                  <MessageCircle className="h-8 w-8 text-green-600 mx-auto mb-2" />
+                  <div className="flex items-center justify-center h-14 w-14 rounded-xl bg-green-100 dark:bg-green-900/40 mx-auto mb-3 group-hover:scale-110 transition-transform">
+                    <MessageCircle className="h-7 w-7 text-green-600 dark:text-green-400" />
+                  </div>
                   <CardTitle className="text-lg">Real-time Chat</CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -115,9 +132,11 @@ export default function HomePage() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-purple-100 dark:border-gray-700">
                 <CardHeader className="text-center">
-                  <Users className="h-8 w-8 text-purple-600 mx-auto mb-2" />
+                  <div className="flex items-center justify-center h-14 w-14 rounded-xl bg-purple-100 dark:bg-purple-900/40 mx-auto mb-3 group-hover:scale-110 transition-transform">
+                    <Users className="h-7 w-7 text-purple-600 dark:text-purple-400" />
+                  </div>
                   <CardTitle className="text-lg">Anonymous & Safe</CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -130,7 +149,7 @@ export default function HomePage() {
 
           {/* Main Action Card */}
           <div className="mb-20">
-            <Card className="max-w-md mx-auto overflow-visible">
+            <Card className="max-w-md mx-auto overflow-visible shadow-xl border-blue-100 dark:border-gray-700">
               <CardHeader>
                 <CardTitle className="text-center">Get Started</CardTitle>
                 <CardDescription className="text-center">
@@ -243,13 +262,16 @@ export default function HomePage() {
           </div>
 
           {/* How It Works */}
-          <div className="bg-white/30 dark:bg-gray-800/30 rounded-2xl p-12 mb-20">
-            <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-8">How It Works</h2>
-            <div className="grid md:grid-cols-3 gap-8">
-              {HOW_IT_WORKS.map((item) => (
-                <div key={item.step} className="text-center">
-                  <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-xl font-bold text-blue-600 dark:text-blue-400">{item.step}</span>
+          <div className="bg-white/40 dark:bg-gray-800/40 backdrop-blur-sm rounded-2xl p-8 md:p-12 mb-20 border border-white/50 dark:border-gray-700/50">
+            <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-10">How It Works</h2>
+            <div className="grid md:grid-cols-3 gap-8 relative">
+              {HOW_IT_WORKS.map((item, idx) => (
+                <div key={item.step} className="text-center relative">
+                  {idx < HOW_IT_WORKS.length - 1 && (
+                    <div className="hidden md:block absolute top-6 left-[60%] w-full h-0.5 bg-gradient-to-r from-blue-300 to-transparent dark:from-blue-700" />
+                  )}
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg relative z-10">
+                    <span className="text-xl font-bold text-white">{item.step}</span>
                   </div>
                   <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{item.title}</h3>
                   <p className="text-sm text-gray-600 dark:text-gray-300">{item.description}</p>
@@ -260,26 +282,38 @@ export default function HomePage() {
 
           {/* Use Cases */}
           <div className="mb-20">
-            <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-8">Perfect For</h2>
+            <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-10">Perfect For</h2>
             <div className="grid md:grid-cols-2 gap-6">
-              {USE_CASES.map((useCase) => (
-                <Card key={useCase.title}>
-                  <CardHeader>
-                    <CardTitle className="text-lg">{useCase.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">{useCase.description}</p>
-                  </CardContent>
-                </Card>
-              ))}
+              {USE_CASES.map((useCase, idx) => {
+                const icons = [Users, MessageCircle, Zap, MessageCircle]
+                const colors = [
+                  'from-blue-500 to-indigo-600',
+                  'from-green-500 to-teal-600',
+                  'from-purple-500 to-pink-600',
+                  'from-orange-500 to-red-600'
+                ]
+                const Icon = icons[idx % icons.length]
+                return (
+                  <Card key={useCase.title} className="group hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 dark:border-gray-700">
+                    <CardHeader>
+                      <div className="flex items-center gap-3">
+                        <div className={`flex items-center justify-center h-10 w-10 rounded-lg bg-gradient-to-br ${colors[idx % colors.length]} shadow-md shrink-0`}>
+                          <Icon className="h-5 w-5 text-white" />
+                        </div>
+                        <CardTitle className="text-lg">{useCase.title}</CardTitle>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">{useCase.description}</p>
+                    </CardContent>
+                  </Card>
+                )
+              })}
             </div>
           </div>
 
           {/* Footer */}
-          <div className="text-center mt-20 pb-8 text-sm text-gray-500 dark:text-gray-400">
-            <p className="mb-2">Messages are automatically deleted after {MESSAGE_RETENTION}</p>
-            <p>© {COPYRIGHT_YEAR} {APP_NAME}. All rights reserved.</p>
-          </div>
+          <Footer />
         </div>
       </div>
     </div>

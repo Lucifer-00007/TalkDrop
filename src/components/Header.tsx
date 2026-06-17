@@ -20,16 +20,18 @@ export default function Header() {
   }
 
   return (
-    <header className="fixed top-0 left-0 right-0 px-2 py-2 flex justify-between items-center z-50 bg-white/50 dark:bg-gray-800/50 backdrop-blur-md">
+    <header className="fixed top-0 left-0 right-0 px-4 py-3 flex justify-between items-center z-50 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border-b border-white/40 dark:border-white/10 shadow-sm">
       <div className="flex items-center">
-        <MessageCircle className="h-6 w-6 text-blue-600 dark:text-blue-400 ml-4" />
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white ml-2">{APP_NAME}</h2>
+        <div className="flex items-center justify-center h-9 w-9 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 shadow-md">
+          <MessageCircle className="h-5 w-5 text-white" />
+        </div>
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white ml-2.5">{APP_NAME}</h2>
       </div>
       <Button
         variant="ghost"
         size="icon"
         onClick={handleToggleTheme}
-        className="dark:text-white"
+        className="dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
       >
         {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
       </Button>

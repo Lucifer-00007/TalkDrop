@@ -26,18 +26,23 @@ export const validateRoomForJoin = async (roomId: string): Promise<RoomValidatio
     return { valid: false, error: 'Firebase not initialized. Please check your configuration.' }
   }
 
+  // Permanent rooms bypass existence and expiry validation
+  if (PERMANENT_ROOM_IDS.has(roomId)) {
+    return { valid: true }
+  }
+
   try {
     const roomRef = doc(firestoreInstance, 'rooms', roomId)
     const roomSnap = await getDoc(roomRef)
 
-    if (!roomSnap.exists() && !PERMANENT_ROOM_IDS.has(roomId)) {
+    if (!roomSnap.exists()) {
       return { valid: false, error: 'Room not found. This room does not exist or has been deleted.' }
     }
 
     const data = roomSnap.data() as RoomMetadata
     const now = new Date()
 
-    if (data.createdAt && !PERMANENT_ROOM_IDS.has(roomId)) {
+    if (data.createdAt) {
       const createdAt = data.createdAt.toDate()
       const expiresAt = new Date(createdAt.getTime() + ROOM_EXPIRY_HOURS * 60 * 60 * 1000)
       if (now > expiresAt) {

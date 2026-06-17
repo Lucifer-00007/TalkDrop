@@ -51,3 +51,4 @@ firestore-debug.log
 Thumbs.db
 ss/
 database-debug.log
+.commandcode/
