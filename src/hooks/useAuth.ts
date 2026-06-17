@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { User, onAuthStateChanged } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
-import { signInAnonymous } from '@/lib/auth'
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null)
@@ -16,38 +15,64 @@ export const useAuth = () => {
     
     console.log('[useAuth] Initializing auth...')
     const authInstance = auth()
-    console.log('[useAuth] Auth instance:', authInstance ? 'initialized' : 'null')
-    if (!authInstance) {
-      console.error('[useAuth] Firebase auth not initialized')
-      setLoading(false)
-      return
-    }
-
-    const unsubscribe = onAuthStateChanged(authInstance, (user) => {
-      console.log('[useAuth] Auth state changed:', user?.email || 'no user')
-      setUser(user)
-      setLoading(false)
-    })
-
+    
     // Get display name from localStorage
     const savedDisplayName = localStorage.getItem('displayName')
     if (savedDisplayName) {
       setDisplayName(savedDisplayName)
     }
 
+    if (!authInstance) {
+      console.error('[useAuth] Firebase auth not initialized')
+      setLoading(false)
+      return
+    }
+
+    const unsubscribe = onAuthStateChanged(authInstance, (firebaseUser) => {
+      console.log('[useAuth] Auth state changed:', firebaseUser?.email || 'no user')
+      if (firebaseUser) {
+        setUser(firebaseUser)
+      } else {
+        // If not signed in to Firebase, check for mock anonymous user
+        const anonUid = localStorage.getItem('anonymousUid')
+        if (anonUid && savedDisplayName) {
+          setUser({ 
+            uid: anonUid, 
+            isAnonymous: true,
+            metadata: { creationTime: new Date().toISOString() } 
+          } as unknown as User)
+        } else {
+          setUser(null)
+        }
+      }
+      setLoading(false)
+    })
+
     return unsubscribe
   }, [])
 
-  const signIn = async (displayName: string) => {
-    try {
-      localStorage.setItem('displayName', displayName)
-      setDisplayName(displayName)
-      const user = await signInAnonymous()
-      return user
-    } catch (error) {
-      console.error('Sign in failed:', error)
-      throw error
+  const signIn = async (name: string) => {
+    localStorage.setItem('displayName', name)
+    setDisplayName(name)
+    
+    const authInstance = auth()
+    if (authInstance?.currentUser) {
+      return authInstance.currentUser
     }
+    
+    let anonUid = localStorage.getItem('anonymousUid')
+    if (!anonUid) {
+      anonUid = 'anon_' + Math.random().toString(36).substr(2, 9)
+      localStorage.setItem('anonymousUid', anonUid)
+    }
+    
+    const mockUser = { 
+      uid: anonUid, 
+      isAnonymous: true,
+      metadata: { creationTime: new Date().toISOString() } 
+    } as unknown as User
+    setUser(mockUser)
+    return mockUser
   }
 
   return {

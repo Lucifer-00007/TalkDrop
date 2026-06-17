@@ -11,6 +11,8 @@ import Header from '@/components/Header'
 import { useAuth } from '@/hooks/useAuth'
 import { DUMMY_ROOMS, APP_NAME, APP_TAGLINE, HOW_IT_WORKS, USE_CASES, MESSAGE_RETENTION, COPYRIGHT_YEAR } from '@/constants'
 import { getRoomPath } from '@/lib/room-url'
+import { validateRoomForJoin, createRoomMetadata } from '@/lib/firestore'
+import { checkRoomHasOnlineUsers } from '@/lib/rtdb'
 
 export default function HomePage() {
   const [roomId, setRoomId] = useState('')
@@ -19,6 +21,7 @@ export default function HomePage() {
   const [roomName, setRoomName] = useState('')
   const [mode, setMode] = useState<'create' | 'join'>('create')
   const [loading, setLoading] = useState(false)
+  const [joinError, setJoinError] = useState('')
   const router = useRouter()
   const { signIn } = useAuth()
 
@@ -26,11 +29,14 @@ export default function HomePage() {
     const newRoomId = roomName.trim() || Math.random().toString(36).substring(2, 8)
     if (displayName.trim()) {
       setLoading(true)
+      setJoinError('')
       try {
-        await signIn(displayName.trim())
+        const user = await signIn(displayName.trim())
+        await createRoomMetadata(newRoomId, { name: newRoomId, createdBy: user.uid })
         router.push(getRoomPath(newRoomId))
       } catch (error) {
         console.error('Failed to create room:', error)
+        setJoinError('Failed to create room. Please try again.')
       } finally {
         setLoading(false)
       }
@@ -41,11 +47,25 @@ export default function HomePage() {
     const targetRoom = selectedRoom || roomId.trim()
     if (targetRoom && displayName.trim()) {
       setLoading(true)
+      setJoinError('')
       try {
+        const validation = await validateRoomForJoin(targetRoom)
+        if (!validation.valid) {
+          setJoinError(validation.error)
+          return
+        }
+
+        const hasUsers = await checkRoomHasOnlineUsers(targetRoom)
+        if (!hasUsers) {
+          setJoinError('This room has no active participants. The room may have been abandoned.')
+          return
+        }
+
         await signIn(displayName.trim())
         router.push(getRoomPath(targetRoom))
       } catch (error) {
         console.error('Failed to join room:', error)
+        setJoinError('Failed to join room. Please try again.')
       } finally {
         setLoading(false)
       }
@@ -131,14 +151,20 @@ export default function HomePage() {
                   <Button
                     variant={mode === 'create' ? 'default' : 'ghost'}
                     className={`flex-1 ${mode !== 'create' ? 'dark:border dark:border-white/20' : ''}`}
-                    onClick={() => setMode('create')}
+                    onClick={() => {
+                      setMode('create')
+                      setJoinError('')
+                    }}
                   >
                     Create New
                   </Button>
                   <Button
                     variant={mode === 'join' ? 'default' : 'ghost'}
                     className={`flex-1 ${mode !== 'join' ? 'dark:border dark:border-white/20' : ''}`}
-                    onClick={() => setMode('join')}
+                    onClick={() => {
+                      setMode('join')
+                      setJoinError('')
+                    }}
                   >
                     Join Existing
                   </Button>
@@ -161,6 +187,11 @@ export default function HomePage() {
                   </div>
                 ) : (
                   <div className="space-y-2">
+                    {joinError && (
+                      <div className="p-3 rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+                        <p className="text-sm text-red-600 dark:text-red-400">{joinError}</p>
+                      </div>
+                    )}
                     <div className="flex gap-2">
                       <Select value={selectedRoom} onValueChange={(value) => {
                         setSelectedRoom(value)

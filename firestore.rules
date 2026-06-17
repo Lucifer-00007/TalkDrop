@@ -16,7 +16,9 @@ service cloud.firestore {
         request.resource.data.name is string &&
         request.resource.data.name.size() > 0 &&
         request.resource.data.name.size() <= 100 &&
-        request.resource.data.createdBy == request.auth.uid &&
+        request.resource.data.createdBy is string &&
+        request.resource.data.createdBy.size() > 0 &&
+        request.resource.data.createdBy.size() <= 128 &&
         request.resource.data.createdAt == request.time;
     }
 
@@ -28,7 +30,9 @@ service cloud.firestore {
           'createdAt',
           'expiresAt'
         ]) &&
-        request.resource.data.senderId == request.auth.uid &&
+        request.resource.data.senderId is string &&
+        request.resource.data.senderId.size() > 0 &&
+        request.resource.data.senderId.size() <= 128 &&
         request.resource.data.senderName is string &&
         request.resource.data.senderName.size() > 0 &&
         request.resource.data.senderName.size() <= 80 &&
@@ -41,14 +45,14 @@ service cloud.firestore {
     }
 
     match /rooms/{roomId} {
-      allow get: if isSignedIn();
+      allow get: if true;
       allow list, delete: if isAdmin();
-      allow create: if isSignedIn() && isValidRoomCreate();
-      allow update: if isAdmin();
+      allow create: if isValidRoomCreate();
+      allow update: if true;
 
       match /messages/{messageId} {
         allow get, list, delete: if isAdmin();
-        allow create: if isSignedIn() && isValidMessageCreate();
+        allow create: if isValidMessageCreate();
         allow update: if isAdmin();
       }
     }

@@ -1,6 +1,5 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import RoomHeader from './RoomHeader'
 import MessageList from './MessageList'
@@ -10,30 +9,25 @@ import { useAuth } from '@/hooks/useAuth'
 import { useRoom } from '@/hooks/useRoom'
 
 export default function ChatWindow({ roomId }: { roomId: string }) {
-  const router = useRouter()
   const { isAuthenticated, signIn } = useAuth()
   const { messages, users, typingUsers, loading, sendMessage, handleTyping, currentUser } = useRoom(roomId)
 
   useEffect(() => {
     const initAuth = async () => {
-      const savedDisplayName = localStorage.getItem('displayName')
-      if (!savedDisplayName) {
-        router.push('/')
-        return
-      }
-      
       if (!isAuthenticated) {
-        try {
-          await signIn(savedDisplayName)
-        } catch (error) {
-          console.error('Authentication failed:', error)
-          router.push('/')
+        const savedDisplayName = localStorage.getItem('displayName')
+        if (savedDisplayName) {
+          try {
+            await signIn(savedDisplayName)
+          } catch (error) {
+            console.error('Authentication failed:', error)
+          }
         }
       }
     }
 
     initAuth()
-  }, [isAuthenticated, router, signIn])
+  }, [isAuthenticated, signIn])
 
   if (loading || !isAuthenticated || !currentUser) {
     return (

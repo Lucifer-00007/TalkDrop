@@ -50,3 +50,4 @@ firestore-debug.log
 # OS
 Thumbs.db
 ss/
+database-debug.log

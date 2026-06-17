@@ -60,7 +60,33 @@
 		- Enforce admin access in route protection, not just client UI.
 		- Tighten Firestore and RTDB rules so admin reads/writes require `isAdmin`, not just `auth != null`.
 
-- [] 
+- [x] Based on the following remove add auth restriction to `create room`. Any anonymous user can create room in existing or new. Fix this following the best practices
+	
+	- The `admin security model` and `create room` user auth are both diff.
+	- The `admin security model` should always follow the static-safe architecture. Refer the ./plans/admin-static-security-migration-plan.md
+	- Also we are using - Next.js static pages, route guard for loading, redirect, and friendly access-denied UX and Firebase client SDK data fetching
+	- We are not using any - Next.js API routes, Next.js middleware, server-side route protection, server sessions or cookies, private request-time backend logic in the deployed app
+                                                                                                          
+	```error-msg
+   XHRPOST                                                                                                             
+   https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyCuH5aAQtDoppgbCB_p_HcKkhv5zVPETQc               
+   [HTTP/3 400  481ms]                                                                                                 
+                                                                                                                       
+   Sign in failed: FirebaseError: Firebase: Error (auth/admin-restricted-operation).                                   
+       NextJS 16                                                                                                       
+   page-598b852560e1b5a1.js:1:1066                                                                                     
+   Failed to create room: FirebaseError: Firebase: Error (auth/admin-restricted-operation).                            
+       NextJS 16                                                                                                       
+   page-598b852560e1b5a1.js:1:6605    .There are some points to be noted:
+   ```
+
+- [] Fix these issue 
+
+- When clicked on url like `http://localhost:3000/room?roomid=yiuj9o` prompt him/her to only enter the unique name and join the chat room with the room-id `yiuj9o`
+
+- When a user is trying to join an existing room using `Room ID`  or like the above link then first check if the room id already exists or if already created or not expired or if there is no user in the room, etc - if any of these issue exist then show this a proper error message, else take the unique name and allow him to join.
+
+- []
 - []
 - []
 

@@ -1,7 +1,7 @@
 import { initializeApp, FirebaseApp } from 'firebase/app'
 import { getAuth, Auth, connectAuthEmulator, setPersistence, browserLocalPersistence } from 'firebase/auth'
 import { getDatabase, Database, connectDatabaseEmulator } from 'firebase/database'
-import { getFirestore, Firestore, connectFirestoreEmulator } from 'firebase/firestore'
+import { initializeFirestore, Firestore, connectFirestoreEmulator } from 'firebase/firestore'
 import { isFirebaseConfigured, FIREBASE_CONFIG_MISSING_MESSAGE } from './config'
 
 let app: FirebaseApp | null = null
@@ -50,7 +50,8 @@ const initializeFirebase = () => {
     app = initializeApp(firebaseConfig)
     auth = getAuth(app)
     rtdb = getDatabase(app)
-    firestore = getFirestore(app)
+    // Use experimentalForceLongPolling to avoid CORS/WebSocket issues in some dev environments
+    firestore = initializeFirestore(app, { experimentalForceLongPolling: true })
     console.log('[Firebase] Initialized successfully')
   } catch (error) {
     console.error('[Firebase] Initialization failed:', error)

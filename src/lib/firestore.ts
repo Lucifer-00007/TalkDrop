@@ -9,6 +9,44 @@ import {
 } from 'firebase/firestore'
 import { firestore } from './firebase'
 
+export const ROOM_EXPIRY_HOURS = 24
+
+export type RoomValidationResult =
+  | { valid: true }
+  | { valid: false; error: string }
+
+export const validateRoomForJoin = async (roomId: string): Promise<RoomValidationResult> => {
+  const firestoreInstance = firestore()
+  if (!firestoreInstance) {
+    return { valid: false, error: 'Firebase not initialized. Please check your configuration.' }
+  }
+
+  try {
+    const roomRef = doc(firestoreInstance, 'rooms', roomId)
+    const roomSnap = await getDoc(roomRef)
+
+    if (!roomSnap.exists()) {
+      return { valid: false, error: 'Room not found. This room does not exist or has been deleted.' }
+    }
+
+    const data = roomSnap.data() as RoomMetadata
+    const now = new Date()
+
+    if (data.createdAt) {
+      const createdAt = data.createdAt.toDate()
+      const expiresAt = new Date(createdAt.getTime() + ROOM_EXPIRY_HOURS * 60 * 60 * 1000)
+      if (now > expiresAt) {
+        return { valid: false, error: 'This room has expired. Rooms are active for 24 hours after creation.' }
+      }
+    }
+
+    return { valid: true }
+  } catch (error) {
+    console.error('Error validating room:', error)
+    return { valid: false, error: 'Failed to validate room. Please try again.' }
+  }
+}
+
 export interface FirestoreMessage {
   senderId: string
   senderName: string
@@ -27,16 +65,19 @@ export const createRoomMetadata = async (roomId: string, metadata: Omit<RoomMeta
   const firestoreInstance = firestore()
   if (!firestoreInstance) throw new Error('Firebase Firestore not initialized')
   const roomRef = doc(firestoreInstance, 'rooms', roomId)
-  const existingRoom = await getDoc(roomRef)
 
-  if (existingRoom.exists()) {
-    return
+  try {
+    await setDoc(roomRef, {
+      ...metadata,
+      createdAt: serverTimestamp(),
+    }, { merge: true })
+  } catch (error) {
+    const firebaseError = error as { code?: string }
+    // If it's a permission-denied error, it likely means the room already exists and we can't overwrite it, which is expected.
+    if (firebaseError?.code !== 'permission-denied') {
+      console.error('Error creating room metadata:', error)
+    }
   }
-
-  await setDoc(roomRef, {
-    ...metadata,
-    createdAt: serverTimestamp(),
-  })
 }
 
 export const saveMessageToFirestore = async (roomId: string, message: Omit<FirestoreMessage, 'createdAt' | 'expiresAt'>) => {

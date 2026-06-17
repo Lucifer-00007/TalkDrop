@@ -1,4 +1,4 @@
-import { ref, push, set, onValue, off, serverTimestamp, onDisconnect } from 'firebase/database'
+import { ref, push, set, get, onValue, off, serverTimestamp, onDisconnect } from 'firebase/database'
 import { rtdb } from './firebase'
 
 export interface RTDBMessage {
@@ -81,6 +81,24 @@ export const setTyping = async (roomId: string, userId: string, isTyping: boolea
     setTimeout(() => set(typingRef, false), 3000)
   } else {
     await set(typingRef, false)
+  }
+}
+
+export const checkRoomHasOnlineUsers = async (roomId: string): Promise<boolean> => {
+  const rtdbInstance = rtdb()
+  if (!rtdbInstance) return false
+
+  try {
+    const presenceRef = ref(rtdbInstance, `rooms/${roomId}/presence`)
+    const snapshot = await get(presenceRef)
+    const data = snapshot.val() as Record<string, RTDBPresence> | null
+
+    if (!data) return false
+
+    return Object.values(data).some((user) => user.online)
+  } catch (error) {
+    console.error('Error checking room presence:', error)
+    return false
   }
 }
 
