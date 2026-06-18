@@ -21,12 +21,32 @@ const ensureAdminUser = async (user: User) => {
 
 export const getAuthErrorMessage = (error: unknown): string => {
   const message = error instanceof Error ? error.message : String(error)
+
   if (message.includes('auth/invalid-credential') || message.includes('auth/wrong-password') || message.includes('auth/user-not-found')) {
-    return 'Invalid credentials'
+    return 'Invalid email or password. Please check your credentials and try again.'
   }
-  if (message.includes('Unauthorized')) {
-    return message
+  if (message.includes('auth/popup-closed-by-user') || message.includes('auth/cancelled-popup-request')) {
+    return 'Sign-in was cancelled. Please try again.'
   }
+  if (message.includes('auth/popup-blocked')) {
+    return 'Sign-in popup was blocked by your browser. Please allow popups for this site and try again.'
+  }
+  if (message.includes('auth/network-request-failed')) {
+    return 'Network error. Please check your internet connection and try again.'
+  }
+  if (message.includes('auth/too-many-requests')) {
+    return 'Too many sign-in attempts. Please try again later.'
+  }
+  if (message.includes('Anonymous users cannot access')) {
+    return 'Guest sessions cannot access the admin panel. Please sign in with an admin account.'
+  }
+  if (message.includes('missing the required admin claim')) {
+    return 'This account does not have admin access. Grant the admin claim using "npm run admin:claims -- grant <your-email>", then sign in again.'
+  }
+  if (message.includes('Firebase auth not initialized')) {
+    return 'Authentication is not available. Please check your Firebase configuration.'
+  }
+
   return 'Authentication failed. Please try again.'
 }
 
@@ -56,7 +76,7 @@ export const signInWithGoogle = async (): Promise<User> => {
     console.log('[Auth] Admin access validated successfully')
     return user
   } catch (error) {
-    console.error('[Auth] Admin access validation failed:', error)
+    console.warn('[Auth] Admin access validation failed:', error instanceof Error ? error.message : error)
     throw error
   }
 }

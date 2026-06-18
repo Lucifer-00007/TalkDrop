@@ -1,20 +1,32 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Shield, Eye, EyeOff, Moon, Sun, Loader2 } from 'lucide-react'
+import { Shield, Eye, EyeOff, Moon, Sun, Loader2, AlertCircle, X } from 'lucide-react'
 import { Button } from './ui/button'
 import { Card } from './ui/card'
 import { Input } from './ui/input'
 import { signInWithEmail, signInWithGoogle, getAuthErrorMessage } from '@/lib/auth'
 import { getTheme, toggleTheme, initTheme } from '@/lib/theme'
 
-export default function AdminAuth() {
+interface AdminAuthProps {
+  authError?: string
+  onAuthError?: (error: string) => void
+}
+
+export default function AdminAuth({ authError = '', onAuthError }: AdminAuthProps) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
   const [isDark, setIsDark] = useState(false)
+
+  const setError = (error: string) => {
+    onAuthError ? onAuthError(error) : undefined
+  }
+
+  const clearError = () => {
+    onAuthError ? onAuthError('') : undefined
+  }
 
   useEffect(() => {
     initTheme()
@@ -28,7 +40,7 @@ export default function AdminAuth() {
 
   const handleEmailAuth = async () => {
     setLoading(true)
-    setError('')
+    clearError()
     try {
       await signInWithEmail(email, password)
     } catch (err: unknown) {
@@ -40,7 +52,7 @@ export default function AdminAuth() {
 
   const handleGoogleAuth = async () => {
     setLoading(true)
-    setError('')
+    clearError()
     try {
       await signInWithGoogle()
     } catch (err: unknown) {
@@ -141,8 +153,19 @@ export default function AdminAuth() {
             Continue with Google
           </Button>
 
-          {error && (
-            <p className="text-sm text-red-500 text-center">{error}</p>
+          {authError && (
+            <div className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-900/50 dark:bg-red-950/40">
+              <AlertCircle className="h-4 w-4 shrink-0 text-red-600 dark:text-red-400 mt-0.5" />
+              <p className="text-sm text-red-700 dark:text-red-300 flex-1">{authError}</p>
+              <button
+                type="button"
+                onClick={clearError}
+                className="shrink-0 text-red-400 hover:text-red-600 dark:hover:text-red-300 transition-colors"
+                aria-label="Dismiss error"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
           )}
         </div>
       </Card>

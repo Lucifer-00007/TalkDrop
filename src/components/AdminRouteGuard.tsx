@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { ShieldAlert, LogOut, UserX } from 'lucide-react'
 import { Button } from './ui/button'
 import AdminAuth from './AdminAuth'
@@ -11,6 +12,7 @@ import { useRouter } from 'next/navigation'
 export default function AdminRouteGuard({ children }: { children: React.ReactNode }) {
   const { user, isAdmin, adminRole, loading, isAnonymous, signOut } = useAdminAccess()
   const router = useRouter()
+  const [authError, setAuthError] = useState('')
 
   if (loading) {
     return <AdminLoginSkeleton />
@@ -50,7 +52,7 @@ export default function AdminRouteGuard({ children }: { children: React.ReactNod
       )
     }
 
-    return <AdminAuth />
+    return <AdminAuth authError={authError} onAuthError={setAuthError} />
   }
 
   if (!isAdmin) {
