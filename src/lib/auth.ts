@@ -64,6 +64,11 @@ export const signUpWithEmail = async (email: string, password: string): Promise<
   return ensureAdminUser(result.user)
 }
 
+export const getCurrentUser = (): User | null => {
+  const authInstance = auth()
+  return authInstance?.currentUser || null
+}
+
 export const signInWithGoogle = async (): Promise<User> => {
   const authInstance = auth()
   if (!authInstance) throw new Error('Firebase auth not initialized')
@@ -79,9 +84,4 @@ export const signInWithGoogle = async (): Promise<User> => {
     console.warn('[Auth] Admin access validation failed:', error instanceof Error ? error.message : error)
     throw error
   }
-}
-
-export const getCurrentUser = (): User | null => {
-  const authInstance = auth()
-  return authInstance?.currentUser || null
 }

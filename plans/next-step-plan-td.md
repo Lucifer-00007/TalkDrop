@@ -16,7 +16,7 @@
 - [x] In `admin/messages` add a lazy loader for the table.
 - [x] In `admin/messages` allign all to the center. (Attach a screenshot)
 
-- [] Fix the function bug:
+- [x] Fix the function bug:
 	```
 	✔ Do you want to install dependencies with npm now? Yes
 
@@ -142,7 +142,7 @@
 
 	Make the analysis practical, conservative, and focused on minimizing the risk of deleting active code.
 
-- [] ./md-docs/DEAD_CODE_ANALYSIS.md - Remove all the 5 Safe to remove and 3 Needs manual review. Only keep this - "### 1. `signUpWithEmail` and `getCurrentUser` in `src/lib/auth.ts`" as it will be used in the admin section.
+- [x] ./md-docs/DEAD_CODE_ANALYSIS.md - Remove all the 5 Safe to remove and 3 Needs manual review. Only keep this - "### 1. `signUpWithEmail` and `getCurrentUser` in `src/lib/auth.ts`" as it will be used in the admin section.
 
 - [x] Do i need to run `npm run admin:claims -- grant <email>` if the gmail is added in authentication/users in firebase ?
 
