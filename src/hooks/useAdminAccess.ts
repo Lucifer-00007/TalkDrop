@@ -3,7 +3,7 @@ import { useAuth } from './useAuth'
 import { getAdminClaims } from '@/lib/admin-access'
 
 export const useAdminAccess = () => {
-  const { user, loading: authLoading } = useAuth()
+  const { user, loading: authLoading, signOut } = useAuth()
   const [isAdmin, setIsAdmin] = useState(false)
   const [adminLoading, setAdminLoading] = useState(true)
   const [adminRole, setAdminRole] = useState<string | null>(null)
@@ -57,5 +57,6 @@ export const useAdminAccess = () => {
     adminRole,
     loading: authLoading || adminLoading,
     isAnonymous: !!user?.isAnonymous,
+    signOut,
   }
 }

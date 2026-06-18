@@ -75,11 +75,25 @@ export const useAuth = () => {
     return mockUser
   }
 
+  const signOut = async () => {
+    localStorage.removeItem('anonymousUid')
+    localStorage.removeItem('displayName')
+    setDisplayName('')
+
+    const authInstance = auth()
+    if (authInstance) {
+      await authInstance.signOut()
+    }
+
+    setUser(null)
+  }
+
   return {
     user,
     loading,
     displayName,
     signIn,
+    signOut,
     isAuthenticated: !!user
   }
 }

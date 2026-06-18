@@ -142,7 +142,8 @@
 
 	Make the analysis practical, conservative, and focused on minimizing the risk of deleting active code.
 
-- [] ./md-docs/DEAD_CODE_ANALYSIS.md - Review this manually and give the AI to make the fixes
+- [] ./md-docs/DEAD_CODE_ANALYSIS.md - Remove all the 5 Safe to remove and 3 Needs manual review. Only keep this - "### 1. `signUpWithEmail` and `getCurrentUser` in `src/lib/auth.ts`" as it will be used in the admin section.
+
 - []
 - []
 - []

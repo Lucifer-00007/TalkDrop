@@ -5,21 +5,11 @@ import { Button } from './ui/button'
 import AdminAuth from './AdminAuth'
 import AdminLayout from './AdminLayout'
 import { useAdminAccess } from '@/hooks/useAdminAccess'
-import { auth } from '@/lib/firebase'
 import { useRouter } from 'next/navigation'
 
 export default function AdminRouteGuard({ children }: { children: React.ReactNode }) {
-  const { user, isAdmin, adminRole, loading, isAnonymous } = useAdminAccess()
+  const { user, isAdmin, adminRole, loading, isAnonymous, signOut } = useAdminAccess()
   const router = useRouter()
-
-  const handleSignOut = async () => {
-    const authInstance = auth()
-    if (authInstance) {
-      await authInstance.signOut()
-    }
-
-    router.push('/')
-  }
 
   if (loading) {
     return (
@@ -48,7 +38,7 @@ export default function AdminRouteGuard({ children }: { children: React.ReactNod
                   <p className="text-sm font-mono break-all">{user.uid}</p>
                 </div>
                 <div className="flex gap-3">
-                  <Button onClick={handleSignOut} className="gap-2">
+                  <Button onClick={signOut} className="gap-2">
                     <LogOut className="h-4 w-4" />
                     Sign Out
                   </Button>
@@ -94,7 +84,7 @@ export default function AdminRouteGuard({ children }: { children: React.ReactNod
                 </p>
               </div>
               <div className="flex gap-3">
-                <Button onClick={handleSignOut} className="gap-2">
+                <Button onClick={signOut} className="gap-2">
                   <LogOut className="h-4 w-4" />
                   Sign Out
                 </Button>
