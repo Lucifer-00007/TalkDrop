@@ -152,7 +152,7 @@
 
 	The script was broken due to firebase-admin v14 API changes (admin.apps → admin.getApps(), admin.credential.cert() → admin.cert(), app.auth() → getAuth(app)), so even if you ran it before, it never actually worked. I fixed all three breaks and added a list action so you can verify claims anytime.
 
-- [] Build an admin management page at /admin/rooms to manage all chat rooms in the application.
+- [x] Build an admin management page at /admin/rooms to manage all chat rooms in the application.
 
 	Requirements:
 		- Show a paginated list of all created chat rooms.
@@ -192,7 +192,24 @@
 
 	Deliver a complete implementation with production-quality code.
 
-- [] Enhance the UI UX of all the admin pages - dashboard, users, messages, settings and profile.
+- [] Redesign and enhance the UI/UX of the admin panel pages: dashboard, users, messages, settings, and profile.
+
+	Goals:
+	- Make the interface visually modern, polished, and professional
+	- Improve usability, clarity, and workflow efficiency for administrators
+	- Keep a consistent design language across all pages
+	- Optimize page hierarchy, spacing, and component organization
+	- Improve mobile responsiveness and accessibility
+	- Refine forms, tables, cards, filters, buttons, alerts, and navigation states
+	- Maintain existing functionality while improving the overall user experience
+
+	Requirements:
+	- Use a clean and consistent layout system
+	- Prioritize important actions and key information
+	- Include clear hover, active, loading, and empty states
+	- Ensure good contrast and readable typography
+	- Reuse components wherever possible for maintainability
+	- Apply best practices for admin dashboard design
 
 - []
 - []
