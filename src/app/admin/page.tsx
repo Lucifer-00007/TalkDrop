@@ -1,20 +1,27 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { getDashboardStats, type DashboardStats } from '@/lib/admin-stats'
 import { getAdminReadErrorMessage } from '@/lib/admin-errors'
-import { MessageSquare, Users, Activity, TrendingUp, Loader2 } from 'lucide-react'
+import { MessageSquare, Users, Activity, TrendingUp, RefreshCw } from 'lucide-react'
+import { AdminDashboardSkeleton } from '@/components/AdminSkeletons'
 
 export default function AdminPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const isFirstLoad = useRef(true)
 
   const loadStats = useCallback(async () => {
-    setLoading(true)
+    if (isFirstLoad.current) {
+      setLoading(true)
+    } else {
+      setRefreshing(true)
+    }
     setError(null)
 
     try {
@@ -27,7 +34,9 @@ export default function AdminPage() {
       setStats(null)
       setError(getAdminReadErrorMessage(error))
     } finally {
+      isFirstLoad.current = false
       setLoading(false)
+      setRefreshing(false)
     }
   }, [])
 
@@ -38,17 +47,16 @@ export default function AdminPage() {
   }, [loadStats])
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    )
+    return <AdminDashboardSkeleton />
   }
 
   return (
     <div className="p-6 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-3xl font-bold">Dashboard</h1>
+          {refreshing && <RefreshCw className="h-4 w-4 animate-spin text-muted-foreground" />}
+        </div>
         <p className="text-muted-foreground mt-1">Real-time overview of your TalkDrop instance</p>
       </div>
 

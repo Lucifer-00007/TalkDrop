@@ -1,9 +1,10 @@
 'use client'
 
-import { Loader2, ShieldAlert, LogOut, UserX } from 'lucide-react'
+import { ShieldAlert, LogOut, UserX } from 'lucide-react'
 import { Button } from './ui/button'
 import AdminAuth from './AdminAuth'
 import AdminLayout from './AdminLayout'
+import { AdminLoginSkeleton } from './AdminSkeletons'
 import { useAdminAccess } from '@/hooks/useAdminAccess'
 import { useRouter } from 'next/navigation'
 
@@ -12,11 +13,7 @@ export default function AdminRouteGuard({ children }: { children: React.ReactNod
   const router = useRouter()
 
   if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    )
+    return <AdminLoginSkeleton />
   }
 
   if (!user || isAnonymous) {

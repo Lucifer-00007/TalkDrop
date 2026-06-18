@@ -2,7 +2,7 @@
 
 ## Notes
 - `border border-gray-200 dark:border-gray-700 rounded-md p-4` - to add borders(card) type to the component
-- 
+- `npm run admin:claims -- grant your-email@gmail.com`
 - 
 - 
 - 
@@ -144,6 +144,15 @@
 
 - [] ./md-docs/DEAD_CODE_ANALYSIS.md - Remove all the 5 Safe to remove and 3 Needs manual review. Only keep this - "### 1. `signUpWithEmail` and `getCurrentUser` in `src/lib/auth.ts`" as it will be used in the admin section.
 
+- [x] Do i need to run `npm run admin:claims -- grant <email>` if the gmail is added in authentication/users in firebase ?
+
+	- Yes, you need to run the grant command — adding a user in Firebase Console → Authentication → Users only creates the auth account. 
+
+	The isAdmin: true custom claim is separate metadata that can only be set via the Firebase Admin SDK, which is what npm run admin:claims -- grant <email> does. There's no way to set custom claims from the Firebase Console UI.
+
+	The script was broken due to firebase-admin v14 API changes (admin.apps → admin.getApps(), admin.credential.cert() → admin.cert(), app.auth() → getAuth(app)), so even if you ran it before, it never actually worked. I fixed all three breaks and added a list action so you can verify claims anytime.
+
+- []
 - []
 - []
 - []

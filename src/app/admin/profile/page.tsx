@@ -6,10 +6,11 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Loader2, Mail, Shield, Calendar, LogOut, Edit2, Copy, Check } from 'lucide-react'
+import { Mail, Shield, Calendar, LogOut, Edit2, Copy, Check } from 'lucide-react'
 import { auth } from '@/lib/firebase'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { AdminProfileSkeleton } from '@/components/AdminSkeletons'
 
 export default function ProfilePage() {
   const { user, adminRole, loading } = useAdminAccess()
@@ -32,11 +33,7 @@ export default function ProfilePage() {
   }
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    )
+    return <AdminProfileSkeleton />
   }
 
   const initials = user?.email?.substring(0, 2).toUpperCase() || 'AD'

@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
-import { Loader2, Search, Users as UsersIcon, UserCheck, UserX } from 'lucide-react'
+import { Search, Users as UsersIcon, UserCheck, UserX } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
 import { rtdb } from '@/lib/firebase'
 import { ref, onValue } from 'firebase/database'
 import { getAdminReadErrorMessage } from '@/lib/admin-errors'
@@ -83,14 +84,6 @@ export default function UsersPage() {
   const onlineUsers = filteredUsers.filter(u => u.status === 'online')
   const offlineUsers = filteredUsers.filter(u => u.status === 'offline')
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    )
-  }
-
   return (
     <div className="p-6 flex flex-col items-center">
       <div className="w-full max-w-6xl space-y-6">
@@ -111,12 +104,10 @@ export default function UsersPage() {
               <Card key={i}>
                 <CardContent className="pt-6">
                   <div className="flex items-center gap-3">
-                    <div className="p-3 rounded-lg bg-muted animate-pulse">
-                      <div className="h-6 w-6 bg-muted-foreground/20 rounded" />
-                    </div>
-                    <div>
-                      <div className="h-8 w-12 bg-muted animate-pulse rounded mb-1" />
-                      <div className="h-4 w-16 bg-muted animate-pulse rounded" />
+                    <Skeleton className="h-12 w-12 rounded-lg" />
+                    <div className="space-y-2">
+                      <Skeleton className="h-7 w-12" />
+                      <Skeleton className="h-4 w-16" />
                     </div>
                   </div>
                 </CardContent>
@@ -190,15 +181,15 @@ export default function UsersPage() {
                 Array.from({ length: 5 }).map((_, i) => (
                   <div key={i} className="flex items-center justify-between p-4 rounded-lg border bg-card">
                     <div className="flex items-center gap-4">
-                      <div className="h-12 w-12 bg-muted animate-pulse rounded-full" />
-                      <div>
-                        <div className="h-4 w-24 bg-muted animate-pulse rounded mb-2" />
-                        <div className="h-3 w-32 bg-muted animate-pulse rounded" />
+                      <Skeleton className="h-12 w-12 rounded-full" />
+                      <div className="space-y-2">
+                        <Skeleton className="h-4 w-24" />
+                        <Skeleton className="h-3 w-32" />
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="h-5 w-12 bg-muted animate-pulse rounded" />
-                      <div className="h-3 w-20 bg-muted animate-pulse rounded" />
+                      <Skeleton className="h-5 w-12 rounded-full" />
+                      <Skeleton className="h-3 w-20" />
                     </div>
                   </div>
                 ))
