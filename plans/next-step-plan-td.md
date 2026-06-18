@@ -152,7 +152,46 @@
 
 	The script was broken due to firebase-admin v14 API changes (admin.apps → admin.getApps(), admin.credential.cert() → admin.cert(), app.auth() → getAuth(app)), so even if you ran it before, it never actually worked. I fixed all three breaks and added a list action so you can verify claims anytime.
 
-- []
+- [] Build an admin management page at /admin/rooms to manage all chat rooms in the application.
+
+	Requirements:
+		- Show a paginated list of all created chat rooms.
+		- Support CRUD operations for rooms:
+		  - View room details
+		  - Update room information
+		  - Delete room
+		- Display key room metrics and metadata, including:
+		  - Room name / title
+		  - Room ID
+		  - Last message date/time
+		  - Number of users joined
+		  - List of joined users
+		  - Number of messages
+		  - Room status (active / disabled)
+		- Add search and filtering features to help admins find rooms easily.
+		  - Search by room name, room ID, or user name
+		  - Filter by status, date range, and user count/message count where applicable
+		- Add enable/disable functionality for rooms.
+		  - When a room is disabled, it must be hidden from normal users
+		  - Disabled rooms must not allow any users to join. Old or New.
+		  - Existing data should remain intact unless the room is deleted
+		- Follow best practices for:
+		  - Clean, maintainable, and scalable code
+		  - Proper separation of concerns
+		  - Reusable components
+		  - Secure admin-only access control
+		  - Validation and error handling
+		  - Good UX for loading, empty, and error states
+
+	Implementation expectations:
+		- Use the existing project architecture and follow current codebase conventions.
+		- Create all necessary frontend changes.
+		- Include any required UI components.
+		- Make the UI responsive and admin-friendly.
+		- Add comments only where they improve clarity.
+
+	Deliver a complete implementation with production-quality code.
+
 - []
 - []
 - []

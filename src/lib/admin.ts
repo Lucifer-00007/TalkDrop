@@ -11,29 +11,27 @@ export interface AdminMessage extends FirestoreMessage {
 export const getAllMessages = async (limitCount = 100): Promise<AdminMessage[]> => {
   const firestoreInstance = firestore()
   if (!firestoreInstance) throw new Error('Firebase Firestore not initialized')
-  
+
   const roomsRef = collection(firestoreInstance, 'rooms')
   const roomsSnapshot = await getDocs(roomsRef)
-  
-  const allMessages: AdminMessage[] = []
-  
-  for (const roomDoc of roomsSnapshot.docs) {
-    const messagesRef = collection(firestoreInstance, 'rooms', roomDoc.id, 'messages')
-    const messagesQuery = query(messagesRef, orderBy('createdAt', 'desc'), limit(limitCount))
-    const messagesSnapshot = await getDocs(messagesQuery)
-    
-    messagesSnapshot.docs.forEach(messageDoc => {
-      allMessages.push({
+
+  const roomMessages = await Promise.all(
+    roomsSnapshot.docs.map(async (roomDoc) => {
+      const messagesRef = collection(firestoreInstance, 'rooms', roomDoc.id, 'messages')
+      const messagesQuery = query(messagesRef, orderBy('createdAt', 'desc'), limit(limitCount))
+      const messagesSnapshot = await getDocs(messagesQuery)
+
+      return messagesSnapshot.docs.map((messageDoc) => ({
         id: messageDoc.id,
         roomId: roomDoc.id,
         ...messageDoc.data() as FirestoreMessage
-      })
+      }))
     })
-  }
-  
-  return allMessages.sort((a, b) => 
-    (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0)
   )
+
+  return roomMessages
+    .flat()
+    .sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0))
 }
 
 export const deleteMessage = async (roomId: string, messageId: string) => {

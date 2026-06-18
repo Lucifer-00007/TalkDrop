@@ -1,4 +1,4 @@
-import { collection, getDocs, query, where, Timestamp } from 'firebase/firestore'
+import { collection, getDocs } from 'firebase/firestore'
 import { ref, get } from 'firebase/database'
 import { firestore, rtdb } from './firebase'
 
@@ -13,59 +13,68 @@ export interface DashboardStats {
 export const getDashboardStats = async (): Promise<DashboardStats> => {
   const firestoreInstance = firestore()
   const rtdbInstance = rtdb()
-  
+
   if (!firestoreInstance) throw new Error('Firebase Firestore not initialized')
 
-  console.log('[Admin Stats] Fetching rooms...')
+  const yesterdayMillis = Date.now() - 24 * 60 * 60 * 1000
+
   const roomsSnapshot = await getDocs(collection(firestoreInstance, 'rooms'))
-  console.log('[Admin Stats] Rooms fetched:', roomsSnapshot.size)
+  const roomIds = roomsSnapshot.docs.map((doc) => doc.id)
   const totalRooms = roomsSnapshot.size
 
-  let totalMessages = 0
-  let messagesLast24h = 0
-  const yesterday = Timestamp.fromDate(new Date(Date.now() - 24 * 60 * 60 * 1000))
+  const [messageStats, presenceStats] = await Promise.all([
+    Promise.all(
+      roomIds.map(async (roomId) => {
+        const messagesSnapshot = await getDocs(
+          collection(firestoreInstance, 'rooms', roomId, 'messages')
+        )
+        let total = messagesSnapshot.size
+        let last24h = 0
 
-  for (const roomDoc of roomsSnapshot.docs) {
-    console.log('[Admin Stats] Fetching messages for room:', roomDoc.id)
-    const messagesSnapshot = await getDocs(
-      collection(firestoreInstance, 'rooms', roomDoc.id, 'messages')
-    )
-    console.log('[Admin Stats] Messages fetched for', roomDoc.id, ':', messagesSnapshot.size)
-    totalMessages += messagesSnapshot.size
-
-    const recentMessages = await getDocs(
-      query(
-        collection(firestoreInstance, 'rooms', roomDoc.id, 'messages'),
-        where('createdAt', '>=', yesterday)
-      )
-    )
-    messagesLast24h += recentMessages.size
-  }
-
-  let activeRooms = 0
-  let activeUsers = 0
-
-  if (rtdbInstance) {
-    for (const roomDoc of roomsSnapshot.docs) {
-      const presenceSnapshot = await get(ref(rtdbInstance, `rooms/${roomDoc.id}/presence`))
-      if (presenceSnapshot.exists()) {
-        const presenceData = presenceSnapshot.val()
-        const onlineUsers = Object.values(presenceData as Record<string, { online?: boolean }>).filter(
-          (p) => p.online
-        ).length
-        if (onlineUsers > 0) {
-          activeRooms++
-          activeUsers += onlineUsers
+        for (const doc of messagesSnapshot.docs) {
+          const createdAt = doc.get('createdAt')
+          if (createdAt) {
+            const ts = typeof createdAt === 'object' && 'toMillis' in createdAt
+              ? createdAt.toMillis()
+              : Number(createdAt)
+            if (ts >= yesterdayMillis) last24h++
+          }
         }
-      }
-    }
-  }
+
+        return { total, last24h }
+      })
+    ),
+    rtdbInstance
+      ? get(ref(rtdbInstance, 'rooms')).then((snapshot) => {
+          let activeRooms = 0
+          let activeUsers = 0
+
+          if (snapshot.exists()) {
+            const roomsData = snapshot.val() as Record<string, { presence?: Record<string, { online?: boolean }> }>
+            for (const roomData of Object.values(roomsData)) {
+              if (roomData.presence) {
+                const onlineCount = Object.values(roomData.presence).filter((p) => p.online).length
+                if (onlineCount > 0) {
+                  activeRooms++
+                  activeUsers += onlineCount
+                }
+              }
+            }
+          }
+
+          return { activeRooms, activeUsers }
+        })
+      : Promise.resolve({ activeRooms: 0, activeUsers: 0 }),
+  ])
+
+  const totalMessages = messageStats.reduce((sum, s) => sum + s.total, 0)
+  const messagesLast24h = messageStats.reduce((sum, s) => sum + s.last24h, 0)
 
   return {
     totalRooms,
-    activeRooms,
+    activeRooms: presenceStats.activeRooms,
     totalMessages,
     messagesLast24h,
-    activeUsers
+    activeUsers: presenceStats.activeUsers,
   }
 }
