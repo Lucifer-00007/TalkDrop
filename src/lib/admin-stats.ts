@@ -28,7 +28,7 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
         const messagesSnapshot = await getDocs(
           collection(firestoreInstance, 'rooms', roomId, 'messages')
         )
-        let total = messagesSnapshot.size
+        const total = messagesSnapshot.size
         let last24h = 0
 
         for (const doc of messagesSnapshot.docs) {

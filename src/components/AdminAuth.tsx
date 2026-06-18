@@ -21,11 +21,15 @@ export default function AdminAuth({ authError = '', onAuthError }: AdminAuthProp
   const [isDark, setIsDark] = useState(false)
 
   const setError = (error: string) => {
-    onAuthError ? onAuthError(error) : undefined
+    if (onAuthError) {
+      onAuthError(error)
+    }
   }
 
   const clearError = () => {
-    onAuthError ? onAuthError('') : undefined
+    if (onAuthError) {
+      onAuthError('')
+    }
   }
 
   useEffect(() => {
