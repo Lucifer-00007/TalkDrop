@@ -1,9 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useAuth } from './useAuth'
 import { getAdminClaims } from '@/lib/admin-access'
 
+const ADMIN_AUTH_FLAG = 'adminAuthState'
+
+export const wasAdminAuthenticated = (): boolean => {
+  if (typeof window === 'undefined') return false
+  return localStorage.getItem(ADMIN_AUTH_FLAG) === 'true'
+}
+
 export const useAdminAccess = () => {
-  const { user, loading: authLoading, signOut } = useAuth()
+  const { user, loading: authLoading, signOut: authSignOut } = useAuth()
   const [isAdmin, setIsAdmin] = useState(false)
   const [adminLoading, setAdminLoading] = useState(true)
   const [adminRole, setAdminRole] = useState<string | null>(null)
@@ -19,6 +26,7 @@ export const useAdminAccess = () => {
           setIsAdmin(false)
           setAdminRole(null)
           setAdminLoading(false)
+          localStorage.removeItem(ADMIN_AUTH_FLAG)
         }
         return
       }
@@ -30,12 +38,18 @@ export const useAdminAccess = () => {
         if (!cancelled) {
           setIsAdmin(claims.isAdmin)
           setAdminRole(claims.adminRole ?? null)
+          if (claims.isAdmin) {
+            localStorage.setItem(ADMIN_AUTH_FLAG, 'true')
+          } else {
+            localStorage.removeItem(ADMIN_AUTH_FLAG)
+          }
         }
       } catch (error) {
         console.error('[Admin Access] Failed to verify admin access:', error)
         if (!cancelled) {
           setIsAdmin(false)
           setAdminRole(null)
+          localStorage.removeItem(ADMIN_AUTH_FLAG)
         }
       } finally {
         if (!cancelled) {
@@ -50,6 +64,11 @@ export const useAdminAccess = () => {
       cancelled = true
     }
   }, [authLoading, user])
+
+  const signOut = useCallback(async () => {
+    localStorage.removeItem(ADMIN_AUTH_FLAG)
+    await authSignOut()
+  }, [authSignOut])
 
   return {
     user,

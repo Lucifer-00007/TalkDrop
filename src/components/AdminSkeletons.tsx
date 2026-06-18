@@ -1,6 +1,61 @@
 import { Skeleton } from '@/components/ui/skeleton'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 
+export function AdminBootSkeleton() {
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="m-auto h-8 w-8 animate-pulse rounded-full bg-muted-foreground/20" />
+    </div>
+  )
+}
+
+export function AdminAppSkeleton() {
+  return (
+    <div className="flex h-screen overflow-hidden">
+      <aside className="hidden md:block w-64 border-r p-4 space-y-4">
+        <div className="flex items-center gap-2 px-2 py-2">
+          <Skeleton className="h-8 w-8 rounded-lg" />
+          <Skeleton className="h-5 w-20" />
+        </div>
+        <div className="space-y-2 pt-4">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} className="h-9 w-full rounded-md" />
+          ))}
+        </div>
+      </aside>
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="border-b h-14 flex items-center justify-between px-6">
+          <Skeleton className="h-5 w-32" />
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-9 w-9 rounded-md" />
+            <Skeleton className="h-8 w-8 rounded-full" />
+          </div>
+        </div>
+        <main className="flex-1 overflow-y-auto p-6 space-y-6">
+          <div className="space-y-2">
+            <Skeleton className="h-8 w-40" />
+            <Skeleton className="h-4 w-72" />
+          </div>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Card key={i}>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-4 w-4 rounded" />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className="h-7 w-12 mb-2" />
+                  <Skeleton className="h-4 w-16" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </main>
+      </div>
+    </div>
+  )
+}
+
 export function AdminLoginSkeleton() {
   return (
     <div className="min-h-screen flex items-center justify-center p-6">

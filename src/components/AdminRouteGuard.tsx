@@ -1,21 +1,27 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ShieldAlert, LogOut, UserX } from 'lucide-react'
 import { Button } from './ui/button'
 import AdminAuth from './AdminAuth'
 import AdminLayout from './AdminLayout'
-import { AdminLoginSkeleton } from './AdminSkeletons'
-import { useAdminAccess } from '@/hooks/useAdminAccess'
+import { AdminLoginSkeleton, AdminAppSkeleton, AdminBootSkeleton } from './AdminSkeletons'
+import { useAdminAccess, wasAdminAuthenticated } from '@/hooks/useAdminAccess'
 import { useRouter } from 'next/navigation'
 
 export default function AdminRouteGuard({ children }: { children: React.ReactNode }) {
   const { user, isAdmin, adminRole, loading, isAnonymous, signOut } = useAdminAccess()
   const router = useRouter()
   const [authError, setAuthError] = useState('')
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   if (loading) {
-    return <AdminLoginSkeleton />
+    if (!mounted) return <AdminBootSkeleton />
+    return wasAdminAuthenticated() ? <AdminAppSkeleton /> : <AdminLoginSkeleton />
   }
 
   if (!user || isAnonymous) {
