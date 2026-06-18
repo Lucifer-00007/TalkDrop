@@ -192,7 +192,8 @@
 
 	Deliver a complete implementation with production-quality code.
 
-- []
+- [] Enhance the UI UX of all the admin pages - dashboard, users, messages, settings and profile.
+
 - []
 - []
 

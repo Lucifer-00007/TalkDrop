@@ -5,6 +5,7 @@ import { ShieldAlert, LogOut, UserX } from 'lucide-react'
 import { Button } from './ui/button'
 import AdminAuth from './AdminAuth'
 import AdminLayout from './AdminLayout'
+import { Toaster } from './ui/toaster'
 import { AdminLoginSkeleton, AdminAppSkeleton, AdminBootSkeleton } from './AdminSkeletons'
 import { useAdminAccess, wasAdminAuthenticated } from '@/hooks/useAdminAccess'
 import { useRouter } from 'next/navigation'
@@ -104,5 +105,10 @@ export default function AdminRouteGuard({ children }: { children: React.ReactNod
     )
   }
 
-  return <AdminLayout>{children}</AdminLayout>
+  return (
+    <>
+      <AdminLayout>{children}</AdminLayout>
+      <Toaster />
+    </>
+  )
 }

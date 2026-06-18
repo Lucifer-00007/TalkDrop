@@ -39,7 +39,13 @@ export const validateRoomForJoin = async (roomId: string): Promise<RoomValidatio
       return { valid: false, error: 'Room not found. This room does not exist or has been deleted.' }
     }
 
-    const data = roomSnap.data() as RoomMetadata
+    const data = roomSnap.data() as RoomMetadata & { status?: 'active' | 'disabled' }
+    
+    // Check if room is disabled
+    if (data.status === 'disabled') {
+      return { valid: false, error: 'This room has been disabled by an administrator.' }
+    }
+
     const now = new Date()
 
     if (data.createdAt) {

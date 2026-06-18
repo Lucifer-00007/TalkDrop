@@ -48,7 +48,7 @@ service cloud.firestore {
       allow get: if true;
       allow list, delete: if isAdmin();
       allow create: if isValidRoomCreate();
-      allow update: if true;
+      allow update: if isAdmin();
 
       match /messages/{messageId} {
         allow get, list, delete: if isAdmin();
