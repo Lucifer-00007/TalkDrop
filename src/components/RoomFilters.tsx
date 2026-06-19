@@ -27,6 +27,10 @@ export function RoomFilters({ filters, onFiltersChange, totalCount, filteredCoun
     onFiltersChange({ ...filters, status })
   }
 
+  const handleRoomTypeChange = (roomType: 'all' | 'default' | 'private') => {
+    onFiltersChange({ ...filters, roomType })
+  }
+
   const handleClearFilters = () => {
     onFiltersChange({})
     setShowAdvanced(false)
@@ -34,6 +38,7 @@ export function RoomFilters({ filters, onFiltersChange, totalCount, filteredCoun
 
   const hasActiveFilters = filters.search || 
     (filters.status && filters.status !== 'all') ||
+    (filters.roomType && filters.roomType !== 'all') ||
     filters.dateFrom ||
     filters.dateTo ||
     filters.minUsers !== undefined ||
@@ -53,6 +58,20 @@ export function RoomFilters({ filters, onFiltersChange, totalCount, filteredCoun
             className="pl-9"
           />
         </div>
+
+        <Select
+          value={filters.roomType || 'all'}
+          onValueChange={(value) => handleRoomTypeChange(value as 'all' | 'default' | 'private')}
+        >
+          <SelectTrigger className="w-full sm:w-[160px]">
+            <SelectValue placeholder="All Rooms" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Rooms</SelectItem>
+            <SelectItem value="default">Default Rooms</SelectItem>
+            <SelectItem value="private">Private Rooms</SelectItem>
+          </SelectContent>
+        </Select>
 
         <Select
           value={filters.status || 'all'}
@@ -80,10 +99,10 @@ export function RoomFilters({ filters, onFiltersChange, totalCount, filteredCoun
 
         {hasActiveFilters && (
           <Button
-            variant="ghost"
+            variant="outline"
             size="default"
             onClick={handleClearFilters}
-            className="gap-2"
+            className="gap-2 border-2"
           >
             <X className="h-4 w-4" />
             Clear

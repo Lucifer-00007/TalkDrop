@@ -219,7 +219,7 @@ export default function ProfilePage() {
                   End your current admin session
                 </p>
               </div>
-              <Button variant="destructive" onClick={handleSignOut} className="gap-2">
+              <Button variant="destructive" onClick={handleSignOut} className="gap-2 border-2">
                 <LogOut className="h-4 w-4" />
                 Sign Out
               </Button>

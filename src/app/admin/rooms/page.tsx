@@ -24,6 +24,7 @@ import {
 import { useToast } from '@/hooks/use-toast'
 import { 
   getAllRooms, 
+  getRoomsLightweight,
   filterRooms, 
   deleteRoom, 
   toggleRoomStatus, 
@@ -59,6 +60,7 @@ export default function AdminRoomsPage() {
   const [filteredRooms, setFilteredRooms] = useState<AdminRoomData[]>([])
   const [filters, setFilters] = useState<RoomFiltersType>({})
   const [loading, setLoading] = useState(true)
+  const [loadingDetails, setLoadingDetails] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   
@@ -71,7 +73,7 @@ export default function AdminRoomsPage() {
   
   const [currentPage, setCurrentPage] = useState(1)
 
-  const loadRooms = useCallback(async (isRefresh = false) => {
+  const loadRooms = useCallback(async (isRefresh = false, lightweight = false) => {
     if (isRefresh) {
       setRefreshing(true)
     } else {
@@ -80,9 +82,29 @@ export default function AdminRoomsPage() {
     setError(null)
 
     try {
-      const data = await getAllRooms()
+      // Use lightweight loading for faster initial load, or full loading on explicit refresh
+      const data = lightweight && !isRefresh 
+        ? await getRoomsLightweight()
+        : await getAllRooms()
+      
       setRooms(data)
       setFilteredRooms(filterRooms(data, filters))
+      
+      // If we loaded lightweight data, optionally load full details in background
+      if (lightweight && !isRefresh) {
+        setLoadingDetails(true)
+        setTimeout(async () => {
+          try {
+            const fullData = await getAllRooms()
+            setRooms(fullData)
+            setFilteredRooms(filterRooms(fullData, filters))
+          } catch (error) {
+            console.error('Failed to load full room details:', error)
+          } finally {
+            setLoadingDetails(false)
+          }
+        }, 100)
+      }
     } catch (error) {
       console.error('Failed to load rooms:', error)
       setError(getAdminReadErrorMessage(error))
@@ -93,7 +115,7 @@ export default function AdminRoomsPage() {
   }, [filters])
 
   useEffect(() => {
-    loadRooms()
+    loadRooms(false, true) // Use lightweight loading for initial load
   }, [loadRooms])
 
   useEffect(() => {
@@ -201,11 +223,14 @@ export default function AdminRoomsPage() {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-3xl font-bold">Rooms</h1>
-            {refreshing && <RefreshCw className="h-4 w-4 animate-spin text-muted-foreground" />}
+            {(refreshing || loadingDetails) && <RefreshCw className="h-4 w-4 animate-spin text-muted-foreground" />}
           </div>
-          <p className="text-muted-foreground mt-1">Manage all chat rooms</p>
+          <p className="text-muted-foreground mt-1">
+            Manage all chat rooms
+            {loadingDetails && <span className="ml-2 text-xs">(loading message counts...)</span>}
+          </p>
         </div>
-        <Button onClick={() => loadRooms(true)} disabled={refreshing}>
+        <Button onClick={() => loadRooms(true, false)} disabled={refreshing}>
           <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
           Refresh
         </Button>

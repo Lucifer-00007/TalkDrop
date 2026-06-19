@@ -1,8 +1,9 @@
-import { collection, getDocs, doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore'
+import { collection, getDocs, doc, getDoc, updateDoc, deleteDoc, query, orderBy, limit, Timestamp } from 'firebase/firestore'
 import { ref, get, remove } from 'firebase/database'
 import { firestore, rtdb } from './firebase'
 import { RTDBPresence } from './rtdb'
 import { RoomMetadata } from './firestore'
+import { DUMMY_ROOMS } from '@/constants'
 
 export interface RoomUser {
   uid: string
@@ -26,12 +27,80 @@ export interface AdminRoomData {
 export interface RoomFilters {
   search?: string
   status?: 'all' | 'active' | 'disabled'
+  roomType?: 'all' | 'default' | 'private'
   dateFrom?: Date
   dateTo?: Date
   minUsers?: number
   maxUsers?: number
   minMessages?: number
   maxMessages?: number
+}
+
+/**
+ * Fast room listing that skips message counts.
+ * Use this for quick overview when message counts aren't critical.
+ */
+export const getRoomsLightweight = async (): Promise<AdminRoomData[]> => {
+  const firestoreInstance = firestore()
+  const rtdbInstance = rtdb()
+  
+  if (!firestoreInstance) throw new Error('Firebase Firestore not initialized')
+
+  const roomsSnapshot = await getDocs(collection(firestoreInstance, 'rooms'))
+  
+  // Fetch room data with only metadata and presence (skip messages for speed)
+  const roomPromises = roomsSnapshot.docs.map(async (roomDoc) => {
+    const roomId = roomDoc.id
+    const metadata = roomDoc.data() as RoomMetadata & { 
+      status?: 'active' | 'disabled'
+      messageCount?: number
+      lastMessageAt?: Timestamp
+    }
+    
+    // Only fetch presence data
+    const presenceData = rtdbInstance
+      ? await get(ref(rtdbInstance, `rooms/${roomId}/presence`))
+          .then(snapshot => snapshot.val() as Record<string, RTDBPresence> | null)
+          .catch(error => {
+            console.error(`Error fetching presence for room ${roomId}:`, error)
+            return null
+          })
+      : null
+
+    // Process presence data
+    let users: RoomUser[] = []
+    if (presenceData) {
+      users = Object.entries(presenceData).map(([uid, data]) => ({
+        uid,
+        displayName: data.displayName,
+        online: data.online,
+        lastSeen: data.lastSeen,
+      }))
+    }
+
+    // Use cached values if available
+    let lastMessageAt: Date | null = null
+    if (metadata.lastMessageAt) {
+      lastMessageAt = typeof metadata.lastMessageAt === 'object' && 'toDate' in metadata.lastMessageAt
+        ? metadata.lastMessageAt.toDate()
+        : null
+    }
+
+    return {
+      id: roomId,
+      name: metadata.name || roomId,
+      createdAt: metadata.createdAt ? metadata.createdAt.toDate() : null,
+      createdBy: metadata.createdBy || 'Unknown',
+      lastMessageAt,
+      userCount: users.length,
+      messageCount: metadata.messageCount || 0,
+      status: metadata.status || 'active',
+      users,
+    }
+  })
+
+  const rooms = await Promise.all(roomPromises)
+  return rooms
 }
 
 export const getAllRooms = async (): Promise<AdminRoomData[]> => {
@@ -41,50 +110,53 @@ export const getAllRooms = async (): Promise<AdminRoomData[]> => {
   if (!firestoreInstance) throw new Error('Firebase Firestore not initialized')
 
   const roomsSnapshot = await getDocs(collection(firestoreInstance, 'rooms'))
-  const rooms: AdminRoomData[] = []
-
-  for (const roomDoc of roomsSnapshot.docs) {
+  
+  // Fetch all room data in parallel using Promise.all
+  const roomPromises = roomsSnapshot.docs.map(async (roomDoc) => {
     const roomId = roomDoc.id
     const metadata = roomDoc.data() as RoomMetadata & { status?: 'active' | 'disabled' }
     
-    // Get messages count and last message time
-    const messagesSnapshot = await getDocs(collection(firestoreInstance, 'rooms', roomId, 'messages'))
+    // Fetch messages, latest message, and presence data in parallel for this room
+    const [messagesSnapshot, latestMessageSnapshot, presenceData] = await Promise.all([
+      getDocs(collection(firestoreInstance, 'rooms', roomId, 'messages')),
+      getDocs(query(
+        collection(firestoreInstance, 'rooms', roomId, 'messages'),
+        orderBy('createdAt', 'desc'),
+        limit(1)
+      )),
+      rtdbInstance
+        ? get(ref(rtdbInstance, `rooms/${roomId}/presence`))
+            .then(snapshot => snapshot.val() as Record<string, RTDBPresence> | null)
+            .catch(error => {
+              console.error(`Error fetching presence for room ${roomId}:`, error)
+              return null
+            })
+        : Promise.resolve(null)
+    ])
+    
     const messageCount = messagesSnapshot.size
     
     let lastMessageAt: Date | null = null
-    if (!messagesSnapshot.empty) {
-      const timestamps = messagesSnapshot.docs
-        .map(doc => doc.get('createdAt'))
-        .filter(Boolean)
-        .map(ts => (typeof ts === 'object' && 'toMillis' in ts ? ts.toMillis() : Number(ts)))
-      
-      if (timestamps.length > 0) {
-        lastMessageAt = new Date(Math.max(...timestamps))
+    if (!latestMessageSnapshot.empty) {
+      const latestMessage = latestMessageSnapshot.docs[0]
+      const timestamp = latestMessage.get('createdAt')
+      if (timestamp && typeof timestamp === 'object' && 'toMillis' in timestamp) {
+        lastMessageAt = new Date(timestamp.toMillis())
       }
     }
 
-    // Get presence data from RTDB
+    // Process presence data
     let users: RoomUser[] = []
-    if (rtdbInstance) {
-      try {
-        const presenceRef = ref(rtdbInstance, `rooms/${roomId}/presence`)
-        const presenceSnapshot = await get(presenceRef)
-        const presenceData = presenceSnapshot.val() as Record<string, RTDBPresence> | null
-        
-        if (presenceData) {
-          users = Object.entries(presenceData).map(([uid, data]) => ({
-            uid,
-            displayName: data.displayName,
-            online: data.online,
-            lastSeen: data.lastSeen,
-          }))
-        }
-      } catch (error) {
-        console.error(`Error fetching presence for room ${roomId}:`, error)
-      }
+    if (presenceData) {
+      users = Object.entries(presenceData).map(([uid, data]) => ({
+        uid,
+        displayName: data.displayName,
+        online: data.online,
+        lastSeen: data.lastSeen,
+      }))
     }
 
-    rooms.push({
+    return {
       id: roomId,
       name: metadata.name || roomId,
       createdAt: metadata.createdAt ? metadata.createdAt.toDate() : null,
@@ -94,9 +166,11 @@ export const getAllRooms = async (): Promise<AdminRoomData[]> => {
       messageCount,
       status: metadata.status || 'active',
       users,
-    })
-  }
+    }
+  })
 
+  // Wait for all rooms to be processed
+  const rooms = await Promise.all(roomPromises)
   return rooms
 }
 
@@ -203,7 +277,16 @@ export const toggleRoomStatus = async (roomId: string, currentStatus: 'active' |
 }
 
 export const filterRooms = (rooms: AdminRoomData[], filters: RoomFilters): AdminRoomData[] => {
+  const defaultRoomIds = new Set(DUMMY_ROOMS.map(r => r.id))
+  
   return rooms.filter(room => {
+    // Room type filter
+    if (filters.roomType && filters.roomType !== 'all') {
+      const isDefaultRoom = defaultRoomIds.has(room.id)
+      if (filters.roomType === 'default' && !isDefaultRoom) return false
+      if (filters.roomType === 'private' && isDefaultRoom) return false
+    }
+
     // Search filter
     if (filters.search) {
       const searchLower = filters.search.toLowerCase()

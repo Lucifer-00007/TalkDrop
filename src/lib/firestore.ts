@@ -6,6 +6,8 @@ import {
   serverTimestamp,
   setDoc,
   Timestamp,
+  updateDoc,
+  increment,
 } from 'firebase/firestore'
 import { firestore } from './firebase'
 import { DUMMY_ROOMS } from '@/constants'
@@ -103,9 +105,22 @@ export const saveMessageToFirestore = async (roomId: string, message: Omit<Fires
   const expirationTime = new Date()
   expirationTime.setHours(expirationTime.getHours() + 24) // 24 hour retention
 
+  // Save the message
   await addDoc(messagesRef, {
     ...message,
     createdAt: serverTimestamp(),
     expiresAt: expirationTime,
   })
+
+  // Update room metadata with message count and last message time
+  try {
+    const roomRef = doc(firestoreInstance, 'rooms', roomId)
+    await updateDoc(roomRef, {
+      messageCount: increment(1),
+      lastMessageAt: serverTimestamp(),
+    })
+  } catch (error) {
+    // If metadata doesn't exist or can't be updated, that's okay
+    console.debug('Could not update room metadata:', error)
+  }
 }

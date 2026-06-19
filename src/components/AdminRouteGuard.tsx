@@ -44,7 +44,7 @@ export default function AdminRouteGuard({ children }: { children: React.ReactNod
                   <p className="text-sm font-mono break-all">{user.uid}</p>
                 </div>
                 <div className="flex gap-3">
-                  <Button onClick={signOut} className="gap-2">
+                  <Button onClick={signOut} className="gap-2 border-2">
                     <LogOut className="h-4 w-4" />
                     Sign Out
                   </Button>
@@ -90,7 +90,7 @@ export default function AdminRouteGuard({ children }: { children: React.ReactNod
                 </p>
               </div>
               <div className="flex gap-3">
-                <Button onClick={signOut} className="gap-2">
+                <Button onClick={signOut} className="gap-2 border-2">
                   <LogOut className="h-4 w-4" />
                   Sign Out
                 </Button>

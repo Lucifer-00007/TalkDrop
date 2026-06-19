@@ -98,8 +98,8 @@ export default function AdminSidebar({ activeTab }: AdminSidebarProps) {
       {/* Sign Out Button */}
       <div className="p-3 border-t bg-muted/30">
         <Button 
-          variant="ghost" 
-          className="w-full justify-start h-10 px-3 text-destructive hover:text-destructive hover:bg-destructive/10" 
+          variant="outline" 
+          className="w-full justify-start h-10 px-3 text-destructive hover:text-destructive hover:bg-destructive/10 border-2" 
           onClick={handleSignOut}
         >
           <LogOut className="h-4 w-4 mr-3" />
