@@ -2,7 +2,7 @@
   "rules": {
     "rooms": {
       ".read": "auth != null && auth.token.isAdmin === true",
-      ".write": false,
+      ".write": "auth != null && auth.token.isAdmin === true",
       "$roomId": {
         ".read": false,
         ".write": false,
@@ -15,13 +15,13 @@
         "presence": {
           ".read": true,
           "$uid": {
-            ".write": "$uid.length > 0 && newData.child('displayName').isString() && newData.child('displayName').val().length > 0 && newData.child('displayName').val().length <= 80 && newData.child('online').isBoolean() && (newData.child('lastSeen').isNumber() || newData.child('lastSeen').val() == now)"
+            ".write": "(auth != null && auth.token.isAdmin === true) || ($uid.length > 0 && newData.child('displayName').isString() && newData.child('displayName').val().length > 0 && newData.child('displayName').val().length <= 80 && newData.child('online').isBoolean() && (newData.child('lastSeen').isNumber() || newData.child('lastSeen').val() == now))"
           }
         },
         "typing": {
           ".read": true,
           "$uid": {
-            ".write": "$uid.length > 0 && newData.isBoolean()"
+            ".write": "(auth != null && auth.token.isAdmin === true) || ($uid.length > 0 && newData.isBoolean())"
           }
         }
       }

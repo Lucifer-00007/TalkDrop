@@ -5,13 +5,32 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Search, Users as UsersIcon, UserCheck, UserX, AlertCircle, Filter } from 'lucide-react'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { useToast } from '@/hooks/use-toast'
+import { Search, Users as UsersIcon, UserCheck, UserX, AlertCircle, Filter, Trash2, MoreVertical } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { rtdb } from '@/lib/firebase'
 import { ref, onValue } from 'firebase/database'
-import { getAdminReadErrorMessage } from '@/lib/admin-errors'
+import { getAdminReadErrorMessage, getAdminActionErrorMessage } from '@/lib/admin-errors'
+import { deleteUserData } from '@/lib/admin-users'
 
 interface User {
   uid: string
@@ -23,11 +42,15 @@ interface User {
 type FilterStatus = 'all' | 'online' | 'offline'
 
 export default function UsersPage() {
+  const { toast } = useToast()
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('all')
   const [error, setError] = useState<string | null>(null)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [userToDelete, setUserToDelete] = useState<User | null>(null)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     const db = rtdb()
@@ -91,6 +114,37 @@ export default function UsersPage() {
 
   const onlineUsers = users.filter(u => u.status === 'online')
   const offlineUsers = users.filter(u => u.status === 'offline')
+
+  const handleDeleteClick = (user: User) => {
+    setUserToDelete(user)
+    setDeleteDialogOpen(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!userToDelete) return
+
+    setDeleting(true)
+    try {
+      const result = await deleteUserData(userToDelete.uid)
+      
+      toast({
+        title: 'User deleted',
+        description: `Successfully deleted user "${userToDelete.displayName}" and all associated data (${result.deletedPresenceCount} presence records, ${result.deletedMessagesCount} messages).`,
+      })
+      
+      setDeleteDialogOpen(false)
+      setUserToDelete(null)
+    } catch (error) {
+      console.error('Failed to delete user:', error)
+      toast({
+        title: 'Failed to delete user',
+        description: getAdminActionErrorMessage(error),
+        variant: 'destructive',
+      })
+    } finally {
+      setDeleting(false)
+    }
+  }
 
   return (
     <div className="p-6 lg:p-8 space-y-8">
@@ -268,6 +322,22 @@ export default function UsersPage() {
                     <p className="text-xs text-muted-foreground hidden sm:block min-w-[140px] text-right">
                       {new Date(user.lastSeen).toLocaleString()}
                     </p>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={() => handleDeleteClick(user)}
+                          className="text-destructive focus:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete User
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
               ))
@@ -275,6 +345,40 @@ export default function UsersPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete User Data?</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div>
+                <p>
+                  This will permanently delete all data for user &quot;{userToDelete?.displayName}&quot;, including:
+                </p>
+                <ul className="mt-2 ml-4 list-disc space-y-1">
+                  <li>Presence data from all rooms</li>
+                  <li>All messages sent by this user</li>
+                  <li>Typing indicators</li>
+                </ul>
+                <p className="mt-3 font-semibold text-destructive">
+                  This action cannot be undone.
+                </p>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 border-2"
+            >
+              {deleting ? 'Deleting...' : 'Delete User Data'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
