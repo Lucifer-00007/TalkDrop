@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import '../styles/globals.css'
 import FirebaseConfigCheck from '@/components/FirebaseConfigCheck'
+import { Toaster } from '@/components/ui/toaster'
 import { APP_METADATA } from '@/constants'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -33,6 +34,7 @@ export default function RootLayout({
         <FirebaseConfigCheck>
           {children}
         </FirebaseConfigCheck>
+        <Toaster />
       </body>
     </html>
   )

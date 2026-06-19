@@ -6,19 +6,19 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-
+import { useToast } from '@/hooks/use-toast'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Separator } from '@/components/ui/separator'
-import { Save, Database, Shield, Clock, RefreshCw, Info, CheckCircle2 } from 'lucide-react'
+import { Save, Database, Shield, Clock, RefreshCw, Info } from 'lucide-react'
 import { collection, getDocs } from 'firebase/firestore'
 import { firestore } from '@/lib/firebase'
-import { getAdminReadErrorMessage } from '@/lib/admin-errors'
+import { getAdminReadErrorMessage, getAdminActionErrorMessage } from '@/lib/admin-errors'
 import { DEFAULT_SETTINGS } from '@/constants'
 
 export default function SettingsPage() {
+  const { toast } = useToast()
   const [settings, setSettings] = useState(DEFAULT_SETTINGS)
   const [rooms, setRooms] = useState<Array<{ id: string; retention: string }>>([])
-  const [saved, setSaved] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -29,25 +29,53 @@ export default function SettingsPage() {
     try {
       const firestoreInstance = firestore()
       if (!firestoreInstance) {
-        setError('Firestore is not available in this session.')
+        const errorMsg = 'Firestore is not available in this session.'
+        setError(errorMsg)
+        toast({
+          title: 'Failed to load rooms',
+          description: errorMsg,
+          variant: 'destructive',
+        })
         return
       }
 
       const snapshot = await getDocs(collection(firestoreInstance, 'rooms'))
       setRooms(snapshot.docs.map((doc) => ({ id: doc.id, retention: '24' })))
+      
+      toast({
+        title: 'Rooms loaded',
+        description: `Successfully loaded ${snapshot.docs.length} rooms.`,
+      })
     } catch (error) {
       console.error('Failed to load rooms:', error)
       setRooms([])
-      setError(getAdminReadErrorMessage(error))
+      const errorMsg = getAdminReadErrorMessage(error)
+      setError(errorMsg)
+      toast({
+        title: 'Failed to load rooms',
+        description: errorMsg,
+        variant: 'destructive',
+      })
     } finally {
       setLoading(false)
     }
   }
 
   const handleSave = () => {
-    // In a real app, save to Firebase/backend
-    setSaved(true)
-    setTimeout(() => setSaved(false), 2000)
+    try {
+      // In a real app, save to Firebase/backend
+      toast({
+        title: 'Settings saved',
+        description: 'Your settings have been saved successfully.',
+      })
+    } catch (error) {
+      console.error('Failed to save settings:', error)
+      toast({
+        title: 'Failed to save settings',
+        description: getAdminActionErrorMessage(error),
+        variant: 'destructive',
+      })
+    }
   }
 
   return (
@@ -287,12 +315,6 @@ export default function SettingsPage() {
           <Save className="h-4 w-4" />
           Save Changes
         </Button>
-        {saved && (
-          <div className="flex items-center gap-2 text-green-600 dark:text-green-500">
-            <CheckCircle2 className="h-5 w-5" />
-            <span className="text-sm font-medium">Settings saved successfully!</span>
-          </div>
-        )}
       </div>
     </div>
   )

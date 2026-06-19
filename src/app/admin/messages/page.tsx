@@ -9,11 +9,13 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
+import { useToast } from '@/hooks/use-toast'
 import { getAllMessages, deleteMessage, deleteRoomMessages, type AdminMessage } from '@/lib/admin'
 import { getAdminActionErrorMessage, getAdminReadErrorMessage } from '@/lib/admin-errors'
 import ConfirmDialog from '@/components/ConfirmDialog'
 
 export default function MessagesPage() {
+  const { toast } = useToast()
   const [messages, setMessages] = useState<AdminMessage[]>([])
   const [loading, setLoading] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
@@ -37,15 +39,28 @@ export default function MessagesPage() {
     try {
       const data = await getAllMessages()
       setMessages(data)
+      
+      if (isRefresh) {
+        toast({
+          title: 'Messages refreshed',
+          description: `Loaded ${data.length} messages.`,
+        })
+      }
     } catch (error) {
       console.error('Failed to load messages:', error)
       setMessages([])
-      setError(getAdminReadErrorMessage(error))
+      const errorMsg = getAdminReadErrorMessage(error)
+      setError(errorMsg)
+      toast({
+        title: 'Failed to load messages',
+        description: errorMsg,
+        variant: 'destructive',
+      })
     } finally {
       setLoading(false)
       setRefreshing(false)
     }
-  }, [])
+  }, [toast])
 
   useEffect(() => {
     loadMessages()
@@ -85,9 +100,20 @@ export default function MessagesPage() {
       setMessages(prev => prev.filter(m => m.id !== selectedMessage.id))
       setDeleteDialogOpen(false)
       setSelectedMessage(null)
+      
+      toast({
+        title: 'Message deleted',
+        description: 'The message has been permanently deleted.',
+      })
     } catch (error) {
       console.error('Failed to delete message:', error)
-      setError(getAdminActionErrorMessage(error))
+      const errorMsg = getAdminActionErrorMessage(error)
+      setError(errorMsg)
+      toast({
+        title: 'Failed to delete message',
+        description: errorMsg,
+        variant: 'destructive',
+      })
     } finally {
       setDeleting(false)
     }
@@ -100,13 +126,25 @@ export default function MessagesPage() {
     setError(null)
 
     try {
+      const roomMessages = messages.filter(m => m.roomId === selectedRoomId)
       await deleteRoomMessages(selectedRoomId)
       setMessages(prev => prev.filter(m => m.roomId !== selectedRoomId))
       setClearRoomDialogOpen(false)
       setSelectedRoomId(null)
+      
+      toast({
+        title: 'Room messages deleted',
+        description: `Successfully deleted ${roomMessages.length} messages from room ${selectedRoomId.substring(0, 8)}...`,
+      })
     } catch (error) {
       console.error('Failed to delete room messages:', error)
-      setError(getAdminActionErrorMessage(error))
+      const errorMsg = getAdminActionErrorMessage(error)
+      setError(errorMsg)
+      toast({
+        title: 'Failed to delete room messages',
+        description: errorMsg,
+        variant: 'destructive',
+      })
     } finally {
       setDeleting(false)
     }
