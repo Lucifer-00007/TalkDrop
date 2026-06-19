@@ -1,12 +1,14 @@
 'use client'
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
-import { Trash2, RefreshCw } from 'lucide-react'
+import { Trash2, RefreshCw, Search, MessageSquare, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Badge } from '@/components/ui/badge'
 import { getAllMessages, deleteMessage, deleteRoomMessages, type AdminMessage } from '@/lib/admin'
 import { getAdminActionErrorMessage, getAdminReadErrorMessage } from '@/lib/admin-errors'
 import ConfirmDialog from '@/components/ConfirmDialog'
@@ -14,6 +16,7 @@ import ConfirmDialog from '@/components/ConfirmDialog'
 export default function MessagesPage() {
   const [messages, setMessages] = useState<AdminMessage[]>([])
   const [loading, setLoading] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
   const [filter, setFilter] = useState('')
   const [sortBy, setSortBy] = useState<'time-desc' | 'time-asc' | 'sender' | 'room'>('time-desc')
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -23,8 +26,12 @@ export default function MessagesPage() {
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const loadMessages = useCallback(async () => {
-    setLoading(true)
+  const loadMessages = useCallback(async (isRefresh = false) => {
+    if (isRefresh) {
+      setRefreshing(true)
+    } else {
+      setLoading(true)
+    }
     setError(null)
 
     try {
@@ -36,6 +43,7 @@ export default function MessagesPage() {
       setError(getAdminReadErrorMessage(error))
     } finally {
       setLoading(false)
+      setRefreshing(false)
     }
   }, [])
 
@@ -105,31 +113,97 @@ export default function MessagesPage() {
   }
 
   return (
-    <div className="p-6 flex flex-col items-center">
-      <div className="w-full max-w-6xl space-y-6">
-        <div className="flex items-center gap-2 mb-6">
-          <h1 className="text-2xl font-bold">Messages</h1>
-          <Button onClick={loadMessages} disabled={loading} size="sm" variant="outline">
-            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-          </Button>
+    <div className="p-6 lg:p-8 space-y-8">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Messages</h1>
+          <p className="text-muted-foreground mt-1.5">Monitor and manage all chat messages</p>
         </div>
+        <Button 
+          onClick={() => loadMessages(true)} 
+          disabled={loading || refreshing}
+          variant="outline"
+          size="sm"
+          className="gap-2"
+        >
+          <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+          Refresh
+        </Button>
+      </div>
 
-        {error && (
-          <Card className="border-amber-500/40 bg-amber-500/5 p-4 text-sm text-muted-foreground">
-            {error}
-          </Card>
-        )}
+      {/* Error Alert */}
+      {error && (
+        <Alert variant="destructive" className="border-amber-500/50 bg-amber-500/10 text-amber-900 dark:text-amber-100">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
 
-        <Card className="p-4 mb-6">
-          <div className="flex gap-4">
-            <Input
-              placeholder="Filter messages by content, sender, or room ID..."
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              className="max-w-md"
-            />
+      {/* Stats Card */}
+      <div className="grid gap-6 md:grid-cols-3">
+        <Card className="border-primary/20">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3.5 rounded-xl bg-primary/10">
+                <MessageSquare className="h-7 w-7 text-primary" />
+              </div>
+              <div>
+                <p className="text-3xl font-bold">{messages.length}</p>
+                <p className="text-sm text-muted-foreground">Total Messages</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="border-muted">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3.5 rounded-xl bg-muted">
+                <MessageSquare className="h-7 w-7 text-muted-foreground" />
+              </div>
+              <div>
+                <p className="text-3xl font-bold">{filteredMessages.length}</p>
+                <p className="text-sm text-muted-foreground">Filtered Results</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-muted">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3.5 rounded-xl bg-muted">
+                <MessageSquare className="h-7 w-7 text-muted-foreground" />
+              </div>
+              <div>
+                <p className="text-3xl font-bold">{new Set(messages.map(m => m.roomId)).size}</p>
+                <p className="text-sm text-muted-foreground">Unique Rooms</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Filters */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Filters</CardTitle>
+          <CardDescription>Search and sort messages</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by content, sender, or room ID..."
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                className="pl-9"
+              />
+            </div>
             <Select value={sortBy} onValueChange={(value: typeof sortBy) => setSortBy(value)}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent>
@@ -140,77 +214,97 @@ export default function MessagesPage() {
               </SelectContent>
             </Select>
           </div>
-        </Card>
+        </CardContent>
+      </Card>
 
-        <Card>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="text-center">Room ID</TableHead>
-                <TableHead className="text-center">Sender</TableHead>
-                <TableHead className="text-center">Message</TableHead>
-                <TableHead className="text-center">Time</TableHead>
-                <TableHead className="text-center">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {loading ? (
-                Array.from({ length: 5 }).map((_, i) => (
-                  <TableRow key={i}>
-                    <TableCell className="text-center"><div className="h-4 bg-muted animate-pulse rounded" /></TableCell>
-                    <TableCell className="text-center"><div className="h-4 bg-muted animate-pulse rounded" /></TableCell>
-                    <TableCell className="text-center"><div className="h-4 bg-muted animate-pulse rounded" /></TableCell>
-                    <TableCell className="text-center"><div className="h-4 bg-muted animate-pulse rounded" /></TableCell>
-                    <TableCell className="text-center"><div className="h-8 bg-muted animate-pulse rounded" /></TableCell>
-                  </TableRow>
-                ))
-              ) : filteredMessages.length === 0 ? (
+      {/* Messages Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>All Messages ({filteredMessages.length})</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                    No messages found
-                  </TableCell>
+                  <TableHead className="w-[15%]">Room ID</TableHead>
+                  <TableHead className="w-[15%]">Sender</TableHead>
+                  <TableHead className="w-[40%]">Message</TableHead>
+                  <TableHead className="w-[15%]">Time</TableHead>
+                  <TableHead className="w-[15%] text-right">Actions</TableHead>
                 </TableRow>
-              ) : (
-                filteredMessages.map((message) => (
-                  <TableRow key={`${message.roomId}-${message.id}`}>
-                    <TableCell className="font-mono text-xs text-center">{message.roomId}</TableCell>
-                    <TableCell className="text-center">{message.senderName}</TableCell>
-                    <TableCell className="max-w-xs truncate text-center">{message.text}</TableCell>
-                    <TableCell className="text-xs text-center">
-                      {message.createdAt?.toDate().toLocaleString() || 'N/A'}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="border-red-600 text-red-600 hover:text-red-700 hover:bg-red-100 dark:hover:bg-red-950 px-2.5 py-1"
-                          onClick={() => {
-                            setSelectedMessage(message)
-                            setDeleteDialogOpen(true)
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => {
-                            setSelectedRoomId(message.roomId)
-                            setClearRoomDialogOpen(true)
-                          }}
-                        >
-                          Clear Room
-                        </Button>
+              </TableHeader>
+              <TableBody>
+                {loading ? (
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <TableRow key={i}>
+                      <TableCell><div className="h-4 bg-muted animate-pulse rounded" /></TableCell>
+                      <TableCell><div className="h-4 bg-muted animate-pulse rounded" /></TableCell>
+                      <TableCell><div className="h-4 bg-muted animate-pulse rounded" /></TableCell>
+                      <TableCell><div className="h-4 bg-muted animate-pulse rounded" /></TableCell>
+                      <TableCell><div className="h-8 bg-muted animate-pulse rounded" /></TableCell>
+                    </TableRow>
+                  ))
+                ) : filteredMessages.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="h-32 text-center">
+                      <div className="flex flex-col items-center justify-center">
+                        <MessageSquare className="h-10 w-10 text-muted-foreground mb-2" />
+                        <p className="text-muted-foreground">
+                          {messages.length === 0 ? 'No messages found' : 'No messages match your filters'}
+                        </p>
                       </div>
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </Card>
-      </div>
+                ) : (
+                  filteredMessages.map((message) => (
+                    <TableRow key={`${message.roomId}-${message.id}`} className="hover:bg-muted/50">
+                      <TableCell className="font-mono text-xs">
+                        <Badge variant="outline" className="font-mono">
+                          {message.roomId.substring(0, 8)}...
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="font-medium">{message.senderName}</TableCell>
+                      <TableCell className="max-w-md">
+                        <p className="truncate">{message.text}</p>
+                      </TableCell>
+                      <TableCell className="text-xs text-muted-foreground">
+                        {message.createdAt?.toDate().toLocaleString() || 'N/A'}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex gap-2 justify-end">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 gap-2"
+                            onClick={() => {
+                              setSelectedRoomId(message.roomId)
+                              setClearRoomDialogOpen(true)
+                            }}
+                          >
+                            Clear Room
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            className="h-8 w-8 p-0"
+                            onClick={() => {
+                              setSelectedMessage(message)
+                              setDeleteDialogOpen(true)
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
 
       <ConfirmDialog
         open={deleteDialogOpen}
