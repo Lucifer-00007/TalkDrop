@@ -1,5 +1,8 @@
 # Plan for Improving the Overall Performance of the System
 
+- This project has reached the end of the beta stage.
+
+
 ## Notes
 - `border border-gray-200 dark:border-gray-700 rounded-md p-4` - to add borders(card) type to the component
 - `npm run admin:claims -- grant your-email@gmail.com`
